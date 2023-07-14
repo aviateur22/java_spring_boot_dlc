@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dlc
+    username: admin
+    password: admin
+logging.level.org.springframework.web: DEBUG
+
+jwt.secret-key: jfldsjflmkdsflmdfhpidhfpdjfdsf*ôpeepîr^r454354343qdsqdqdd44254
+jwt.issuer: ctoutweb
+
