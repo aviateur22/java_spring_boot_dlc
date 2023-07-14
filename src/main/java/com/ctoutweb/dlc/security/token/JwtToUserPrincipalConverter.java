@@ -9,7 +9,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ctoutweb.dlc.security.UserPrincipal;
 
 @Component
-public class JwtToUserPrincipal {
+public class JwtToUserPrincipalConverter {
 	
 	public UserPrincipal convert(DecodedJWT jwt) {
 		List<SimpleGrantedAuthority> authorities = getGrantedAuthoritiesFromClaim(jwt);

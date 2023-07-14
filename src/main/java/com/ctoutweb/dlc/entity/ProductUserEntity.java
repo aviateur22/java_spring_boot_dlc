@@ -10,6 +10,10 @@ public class ProductUserEntity {
 	private Date createdAt;
 	private Date updatedAt;
 	
+	public ProductUserEntity() {
+		
+	}
+	
 	private ProductUserEntity(Builder builder) {
 		this.id = builder.id;
 		this.user_id = builder.user_id;

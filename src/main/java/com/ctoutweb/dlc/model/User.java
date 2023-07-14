@@ -4,18 +4,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import com.ctoutweb.dlc.security.Role;
-
 import java.util.Collections;
 
 public class User {
 	
 	private int id;
-	private String email;		
+	private String email;	
+	private String password;
 	private Date lastLoginAt;
-	private List<Role> roles;
+	private List<UserRole> roles;
 	private List<Friend> friends;
 	private List<Product> products;
+	private boolean isAccountActive;
 	private Date createdAt;
 	private Date updatedAt;
 	
@@ -26,10 +26,12 @@ public class User {
 	private User(Builder builder) {
 		this.id = builder.id;
 		this.email = builder.email;
+		this.password = builder.password;
 		this.lastLoginAt = builder.lastLoginAt;
 		this.roles = builder.roles;
 		this.friends = builder.friends;
 		this.products = builder.products;
+		this.isAccountActive = builder.isAccountActive;
 		this.createdAt = builder.createdAt;
 		this.updatedAt = builder.updatedAt;
 	}
@@ -57,6 +59,14 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
 	/**
 	 * @return the lastLoginAt
 	 */
@@ -72,13 +82,13 @@ public class User {
 	/**
 	 * @return the roles
 	 */
-	public List<Role> getRoles() {
+	public List<UserRole> getRoles() {
 		return roles;
 	}
 	/**
 	 * @param roles the roles to set
 	 */
-	public void setRoles(List<Role> roles) {
+	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
 	}
 	/**
@@ -105,6 +115,14 @@ public class User {
 	public void setProducts(List<Product> products) {
 		this.products = products;
 	}
+	public boolean getIsAccountActive() {
+		return isAccountActive;
+	}
+
+	public void setAccountActive(boolean isAccountActive) {
+		this.isAccountActive = isAccountActive;
+	}
+
 	/**
 	 * @return the createdAt
 	 */
@@ -161,10 +179,12 @@ public class User {
 	public static final class Builder {
 		private int id;
 		private String email;
+		private String password;
 		private Date lastLoginAt;
-		private List<Role> roles = Collections.emptyList();
+		private List<UserRole> roles = Collections.emptyList();
 		private List<Friend> friends = Collections.emptyList();
 		private List<Product> products = Collections.emptyList();
+		private boolean isAccountActive;
 		private Date createdAt;
 		private Date updatedAt;
 
@@ -180,13 +200,18 @@ public class User {
 			this.email = email;
 			return this;
 		}
-
+		
+		public Builder withPassword(String password) {
+			this.password = password;
+			return this;
+		}
+		
 		public Builder withLastLoginAt(Date lastLoginAt) {
 			this.lastLoginAt = lastLoginAt;
 			return this;
 		}
 
-		public Builder withRoles(List<Role> roles) {
+		public Builder withRoles(List<UserRole> roles) {
 			this.roles = roles;
 			return this;
 		}
@@ -198,6 +223,11 @@ public class User {
 
 		public Builder withProducts(List<Product> products) {
 			this.products = products;
+			return this;
+		}
+		
+		public Builder withIsAccountActive(boolean isAccountActive) {
+			this.isAccountActive = isAccountActive;
 			return this;
 		}
 

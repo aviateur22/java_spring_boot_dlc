@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public class FriendEntity {
 	private int id;
-	private int user_id;
-	private int product_id;
+	private int userId;
+	private int friendId;
 	private String nickname;
 	private Boolean isFriendRequestView;
 	private Boolean isFriendRequestAccepted;
@@ -16,8 +16,8 @@ public class FriendEntity {
 	
 	private FriendEntity(Builder builder) {
 		this.id = builder.id;
-		this.user_id = builder.user_id;
-		this.product_id = builder.product_id;
+		this.userId = builder.userId;
+		this.friendId = builder.friendId;
 		this.nickname = builder.nickname;
 		this.isFriendRequestView = builder.isFriendRequestView;
 		this.isFriendRequestAccepted = builder.isFriendRequestAccepted;
@@ -40,26 +40,26 @@ public class FriendEntity {
 	/**
 	 * @return the user_id
 	 */
-	public int getUser_id() {
-		return user_id;
+	public int getUserId() {
+		return userId;
 	}
 	/**
 	 * @param user_id the user_id to set
 	 */
-	public void setUser_id(int user_id) {
-		this.user_id = user_id;
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 	/**
 	 * @return the product_id
 	 */
-	public int getProduct_id() {
-		return product_id;
+	public int getFriendId() {
+		return friendId;
 	}
 	/**
 	 * @param product_id the product_id to set
 	 */
-	public void setProduct_id(int product_id) {
-		this.product_id = product_id;
+	public void setFriendId(int friendId) {
+		this.friendId = friendId;
 	}
 	/**
 	 * @return the nickname
@@ -136,7 +136,7 @@ public class FriendEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hash(createdAt, id, isFriendRequestAccepted, isFriendRequestView, isRelationAccepeted, nickname,
-				product_id, updatedAt, user_id);
+				friendId, updatedAt, userId);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -151,12 +151,12 @@ public class FriendEntity {
 				&& Objects.equals(isFriendRequestAccepted, other.isFriendRequestAccepted)
 				&& Objects.equals(isFriendRequestView, other.isFriendRequestView)
 				&& Objects.equals(isRelationAccepeted, other.isRelationAccepeted)
-				&& Objects.equals(nickname, other.nickname) && product_id == other.product_id
-				&& Objects.equals(updatedAt, other.updatedAt) && user_id == other.user_id;
+				&& Objects.equals(nickname, other.nickname) && friendId == other.friendId
+				&& Objects.equals(updatedAt, other.updatedAt) && userId == other.userId;
 	}
 	@Override
 	public String toString() {
-		return "FriendEntity [id=" + id + ", user_id=" + user_id + ", product_id=" + product_id + ", nickname="
+		return "FriendEntity [id=" + id + ", user_id=" + userId + ", product_id=" + friendId + ", nickname="
 				+ nickname + ", isFriendRequestView=" + isFriendRequestView + ", isFriendRequestAccepted="
 				+ isFriendRequestAccepted + ", isRelationAccepeted=" + isRelationAccepeted + ", createdAt=" + createdAt
 				+ ", updatedAt=" + updatedAt + "]";
@@ -168,8 +168,8 @@ public class FriendEntity {
 	
 	public static final class Builder {
 		private int id;
-		private int user_id;
-		private int product_id;
+		private int userId;
+		private int friendId;
 		private String nickname;
 		private Boolean isFriendRequestView;
 		private Boolean isFriendRequestAccepted;
@@ -185,13 +185,13 @@ public class FriendEntity {
 			return this;
 		}
 
-		public Builder withUser_id(int user_id) {
-			this.user_id = user_id;
+		public Builder withUserId(int userId) {
+			this.userId = userId;
 			return this;
 		}
 
-		public Builder withProduct_id(int product_id) {
-			this.product_id = product_id;
+		public Builder withFriendId(int friendId) {
+			this.friendId = friendId;
 			return this;
 		}
 

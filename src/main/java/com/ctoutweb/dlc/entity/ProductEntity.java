@@ -10,6 +10,7 @@ public class ProductEntity {
 	private String fileExtension;
 	private Date productEndDate;
 	private Date productOpenDate;
+	private int userId;
 	private Date createdAt;
 	private Date updatedAt;
 	
@@ -24,6 +25,7 @@ public class ProductEntity {
 		this.fileExtension = builder.fileExtension;
 		this.productEndDate = builder.productEndDate;
 		this.productOpenDate = builder.productOpenDate;
+		this.setUserId(builder.userId);
 		this.createdAt = builder.createdAt;
 		this.updatedAt = builder.updatedAt;
 	}
@@ -100,6 +102,14 @@ public class ProductEntity {
 	public void setProductOpenDate(Date productOpenDate) {
 		this.productOpenDate = productOpenDate;
 	}
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
 	/**
 	 * @return the createdAt
 	 */
@@ -160,6 +170,7 @@ public class ProductEntity {
 		private String fileExtension;
 		private Date productEndDate;
 		private Date productOpenDate;
+		private int userId;
 		private Date createdAt;
 		private Date updatedAt;
 
@@ -193,6 +204,11 @@ public class ProductEntity {
 
 		public Builder withProductOpenDate(Date productOpenDate) {
 			this.productOpenDate = productOpenDate;
+			return this;
+		}
+		
+		public Builder withUserId(int userId) {
+			this.userId = userId;
 			return this;
 		}
 

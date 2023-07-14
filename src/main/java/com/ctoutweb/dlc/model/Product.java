@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class Product {
 	private int id;
+	private int userId;
 	private String path;
 	private Date productEndDate;
 	private Date productOpenDate;
@@ -24,6 +25,14 @@ public class Product {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	/**
@@ -117,6 +126,7 @@ public class Product {
 	
 	public Product(Builder builder) {
 		this.id = builder.id;
+		this.userId = builder.userId;
 		this.path = builder.path;		
 		this.productEndDate = builder.productEndDate;
 		this.productOpenDate = builder.productOpenDate;
@@ -125,6 +135,7 @@ public class Product {
 	
 	public static final class Builder {
 		private int id;
+		private int userId;
 		private String path;		
 		private Date productEndDate;
 		private Date productOpenDate;
@@ -135,6 +146,11 @@ public class Product {
 
 		public Builder withId(int id) {
 			this.id = id;
+			return this;
+		}
+		
+		public Builder withUserId(int userId) {
+			this.userId = userId;
 			return this;
 		}
 

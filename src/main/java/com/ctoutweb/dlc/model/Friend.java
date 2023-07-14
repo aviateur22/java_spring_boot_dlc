@@ -6,19 +6,27 @@ import java.util.Objects;
 public class Friend {
 	private int id;
 	private int friendId;
+	private String email;	
 	private String nickname;
 	private boolean isFriendRequestView;
 	private boolean isFriendRequestAccepted;
-	private boolean isFriendRelationAccepted;
+	private boolean isRelationAccepted;
+	private Date friendCreatedAt;
 	private Date createdAt;
 
+	public Friend() {
+		
+	}
+	
 	private Friend(Builder builder) {
 		this.id = builder.id;
 		this.friendId = builder.friendId;
+		this.email = builder.email;
 		this.nickname = builder.nickname;
 		this.isFriendRequestView = builder.isFriendRequestView;
 		this.isFriendRequestAccepted = builder.isFriendRequestAccepted;
-		this.isFriendRelationAccepted = builder.isFriendRelationAccepted;
+		this.isRelationAccepted = builder.isFriendRelationAccepted;
+		this.friendCreatedAt = builder.friendCreatedAt;
 		this.createdAt = builder.createdAt;
 	}
 	/**
@@ -44,6 +52,12 @@ public class Friend {
 	 */
 	public void setFriendId(int friendId) {
 		this.friendId = friendId;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	/**
 	 * @return the nickname
@@ -85,13 +99,19 @@ public class Friend {
 	 * @return the isFriendRelationAccepted
 	 */
 	public boolean isFriendRelationAccepted() {
-		return isFriendRelationAccepted;
+		return isRelationAccepted;
 	}
 	/**
 	 * @param isFriendRelationAccepted the isFriendRelationAccepted to set
 	 */
 	public void setFriendRelationAccepted(boolean isFriendRelationAccepted) {
-		this.isFriendRelationAccepted = isFriendRelationAccepted;
+		this.isRelationAccepted = isFriendRelationAccepted;
+	}
+	public Date getFriendCreatedAt() {
+		return friendCreatedAt;
+	}
+	public void setFriendCreatedAt(Date friendCreatedAt) {
+		this.friendCreatedAt = friendCreatedAt;
 	}
 	public Date getCreatedAt() {
 		return createdAt;
@@ -101,7 +121,7 @@ public class Friend {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(friendId, id, isFriendRelationAccepted, isFriendRequestAccepted, isFriendRequestView,
+		return Objects.hash(friendId, id, isRelationAccepted, isFriendRequestAccepted, isFriendRequestView,
 				nickname, createdAt);
 	}
 	@Override
@@ -114,7 +134,7 @@ public class Friend {
 			return false;
 		Friend other = (Friend) obj;
 		return friendId == other.friendId && id == other.id
-				&& isFriendRelationAccepted == other.isFriendRelationAccepted
+				&& isRelationAccepted == other.isRelationAccepted
 				&& isFriendRequestAccepted == other.isFriendRequestAccepted
 				&& isFriendRequestView == other.isFriendRequestView && Objects.equals(nickname, other.nickname)
 				&& Objects.equals(createdAt, other.createdAt);
@@ -123,7 +143,7 @@ public class Friend {
 	public String toString() {
 		return "Friend [id=" + id + ", friendId=" + friendId + ", nickname=" + nickname + ", isFriendRequestView="
 				+ isFriendRequestView + ", isFriendRequestAccepted=" + isFriendRequestAccepted
-				+ ", isFriendRelationAccepted=" + isFriendRelationAccepted + ", updatedAt=" + createdAt + "]";
+				+ ", isFriendRelationAccepted=" + isRelationAccepted + ", updatedAt=" + createdAt + "]";
 	}
 	
 	public static Builder builder() {
@@ -133,10 +153,12 @@ public class Friend {
 	public static final class Builder {
 		private int id;
 		private int friendId;
+		private String email;	
 		private String nickname;
 		private boolean isFriendRequestView;
 		private boolean isFriendRequestAccepted;
 		private boolean isFriendRelationAccepted;
+		private Date friendCreatedAt;
 		private Date createdAt;
 
 		private Builder() {
@@ -149,6 +171,11 @@ public class Friend {
 
 		public Builder withFriendId(int friendId) {
 			this.friendId = friendId;
+			return this;
+		}
+		
+		public Builder withEmail(String email) {
+			this.email = email;
 			return this;
 		}
 
@@ -169,6 +196,11 @@ public class Friend {
 
 		public Builder withIsFriendRelationAccepted(boolean isFriendRelationAccepted) {
 			this.isFriendRelationAccepted = isFriendRelationAccepted;
+			return this;
+		}
+		
+		public Builder withFriendCreatedAt(Date createdAt) {
+			this.friendCreatedAt = createdAt;
 			return this;
 		}
 
