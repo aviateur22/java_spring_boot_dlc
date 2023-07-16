@@ -10,26 +10,25 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.model.UserRole;
-import com.ctoutweb.dlc.service.UserService;
+import com.ctoutweb.dlc.repository.UserRepository;
 
 @Component
-public class UserPrincipalDetailService implements UserDetailsService {
+public class UserPrincipalDetailService implements UserDetailsService {	
 	
-	private final UserService userService;
-	
+	private final UserRepository userRepository;	
 
-	public UserPrincipalDetailService(UserService userService) {
-		super();
-		this.userService = userService;
+	public UserPrincipalDetailService(UserRepository userRepository) {
+		super();		
+		this.userRepository = userRepository;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
-		User user = (User) userService.findUserInformation(username);
-		System.out.println(user.getIsAccountActive());
+		User user = userRepository.findUserByEmail(username).orElseThrow(()->new UserNotFoundException("email ou mot de passe invalid"));
 		
 		return UserPrincipal.builder()
 				.withId(user.getId())

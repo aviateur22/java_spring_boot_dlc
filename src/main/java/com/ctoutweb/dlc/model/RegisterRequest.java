@@ -2,9 +2,27 @@ package com.ctoutweb.dlc.model;
 
 import java.util.Objects;
 
+import com.ctoutweb.dlc.annotation.password.PasswordConstraint;
+import com.ctoutweb.dlc.annotation.password.PasswordMatcher;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+@PasswordMatcher(message = "erreur confirmation mot de passe")
 public class RegisterRequest {
+	@NotNull(message = "l'email obligatoire")
+	@NotBlank(message = "l'email obligatoire")
+	@Email(message="format de l'email invalide")
 	private String email;
+	
+	@NotNull(message="le mot de passe est obligatoire")
+	@NotBlank(message="le mot de passe est obligatoire")
+	@PasswordConstraint(message = "mot de passe non valide", length = 11)
 	private String password;
+	
+	@NotNull(message="la confirmation de mot de passe est obligatoire")
+	@NotBlank(message="la confirmation de mot de passe est obligatoire")
 	private String confirmPassword;
 	
 	/**
