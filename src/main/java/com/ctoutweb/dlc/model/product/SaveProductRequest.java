@@ -5,9 +5,23 @@ import java.util.Objects;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ctoutweb.dlc.annotation.file.FileExtension;
+import com.ctoutweb.dlc.annotation.file.FileNotNull;
+import com.ctoutweb.dlc.annotation.file.FileSize;
+
+import jakarta.validation.constraints.NotNull;
+
 public class SaveProductRequest {
+	
+	@FileNotNull(message = "l'ajout d'une image est obligatoire")
+	@FileSize(size = 5000000, message = "le fichier ne doit pas dépasser 5Mo")
+	@FileExtension(message="seules les fichiers png et jpg sont accéptés")
 	private MultipartFile file;
+	
+	@NotNull(message="la date d'ouverture est obligatoire")
 	private Date productOpenDate;
+	
+	@NotNull(message = "la dlc est obligatoire")
 	private Date productEndDate;
 	/**
 	 * @return the file
