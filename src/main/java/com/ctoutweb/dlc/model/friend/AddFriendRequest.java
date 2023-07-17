@@ -2,7 +2,13 @@ package com.ctoutweb.dlc.model.friend;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 public class AddFriendRequest {
+	@NotNull(message="l'email est obligatoire")
+	@NotNull(message="l'email est obligatoire")
+	@Email(message="mauvais format de l'email")
 	private String email;
 	
 	public AddFriendRequest() {

@@ -5,18 +5,23 @@ import java.nio.file.FileAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ctoutweb.dlc.exception.custom.AnnotationException;
 import com.ctoutweb.dlc.exception.custom.FileException;
 import com.ctoutweb.dlc.exception.custom.FriendNotFindException;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.model.ErrorResponse;
+
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class HandlerException {
@@ -68,6 +73,24 @@ public class HandlerException {
 	@ExceptionHandler(value = {FileAlreadyExistsException.class})
 	public ResponseEntity<ErrorResponse>FileAlreadyExistsException(FileAlreadyExistsException ex, WebRequest request){
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = {TokenExpiredException.class})
+	public ResponseEntity<ErrorResponse>TokenExpiredException(TokenExpiredException ex, WebRequest request){
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.FORBIDDEN);
+	}
+	
+	@ExceptionHandler(value = {HttpMessageNotReadableException.class})
+	public ResponseEntity<ErrorResponse>HttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request){
+		ErrorResponse error = new ErrorResponse("les données envoyées ne sont pas correctes");
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = {ConstraintViolationException.class, MethodArgumentTypeMismatchException.class})
+	public ResponseEntity<ErrorResponse>ConstraintViolationException(RuntimeException ex, WebRequest request){
+		ErrorResponse error = new ErrorResponse("les données envoyées ne sont pas correctes");
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 }
