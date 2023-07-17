@@ -2,7 +2,6 @@ package com.ctoutweb.dlc.service;
 
 import org.springframework.stereotype.Service;
 
-import com.ctoutweb.dlc.annotation.AnnotationValidator;
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.repository.UserRepository;

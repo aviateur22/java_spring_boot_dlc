@@ -37,9 +37,10 @@ CREATE TABLE "friends"(
 "user_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
 "friend_id" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
 "nickname" TEXT,
-"is_friend_request_view" BOOLEAN NOT NULL DEFAULT FALSE,
+"is_friend_request_new" BOOLEAN NOT NULL DEFAULT TRUE,
 "is_friend_request_accepted" BOOLEAN NOT NULL DEFAULT FALSE,
 "is_relation_accepted" BOOLEAN NOT NULL DEFAULT FALSE,
+"is_relation_deleted" BOOLEAN NOT NULL DEFAULT FALSE,
 "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
 "updated_at" TIMESTAMPTZ
 );

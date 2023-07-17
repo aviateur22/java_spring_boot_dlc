@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.model;
+package com.ctoutweb.dlc.model.auth;
 
 public class LoginResponse {
 	private String token;

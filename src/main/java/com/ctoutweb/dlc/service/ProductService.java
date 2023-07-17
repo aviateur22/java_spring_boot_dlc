@@ -1,0 +1,85 @@
+package com.ctoutweb.dlc.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.ctoutweb.dlc.entity.ProductEntity;
+import com.ctoutweb.dlc.entity.ProductUserEntity;
+import com.ctoutweb.dlc.exception.custom.FileException;
+import com.ctoutweb.dlc.model.Friend;
+import com.ctoutweb.dlc.model.Product;
+import com.ctoutweb.dlc.model.product.DeleteProductResponse;
+import com.ctoutweb.dlc.model.product.SaveProductRequest;
+import com.ctoutweb.dlc.model.product.SaveProductResponse;
+import com.ctoutweb.dlc.repository.FriendsRepository;
+import com.ctoutweb.dlc.repository.ProductRepository;
+import com.ctoutweb.dlc.repository.ProductUserRepository;
+import com.ctoutweb.dlc.service.storage.StorageService;
+
+@Service
+public class ProductService {
+	
+	private final FriendsRepository friendRepository;
+	private final ProductRepository productRepository;
+	private final StorageService storageService;	
+	private final ProductUserRepository productUserRepository;
+	
+
+	public ProductService(
+			FriendsRepository friendRepository, 
+			ProductRepository productRepository, 
+			StorageService storageService, 
+			ProductUserRepository productUserRepository) {
+		super();
+		this.friendRepository = friendRepository;
+		this.productRepository = productRepository;
+		this.storageService = storageService;
+		this.productUserRepository = productUserRepository;		
+	}
+
+	public SaveProductResponse saveProduct(SaveProductRequest productRequest, int userId) {
+				
+		ProductEntity product = storageService.saveFile(productRequest, userId);
+	
+		List<Friend> friends = friendRepository.findFriendByUserIdWithRelationAccepted(userId)
+				.stream()				
+				.map(friend-> Friend.builder()						
+						.withFriendId(friend.getFriendId())
+						.build())
+				.collect(Collectors.toList());				
+		
+		// Add Owner to the friend list
+		friends.add(Friend.builder().withFriendId(userId).build());
+		
+		productRepository.saveProduct(product, friends);		
+		
+		return SaveProductResponse.builder()
+				.withMessage("produit ajouté")
+				.build();
+	}
+	
+	public List<Product> findProductsByUserId(int userId){
+		return productRepository.findProductsByUserId(userId);
+	}
+	
+	public DeleteProductResponse deleteProductById(int productId, int userId) {
+		ProductEntity product = productRepository.findProductById(productId).orElseThrow(()-> new FileException("ce produit n'est pas référencé"));		
+		productUserRepository.findProductByUserIdAndProductId(userId, productId).orElseThrow(()-> new FileException("vous n'êtes pas rattaché à ce produit"));
+		
+		// find productId in product_user  > 1 alors suppression de la ligne userId - productId dans product_user
+		if(productUserRepository.findProductByProductId(productId).size() > 1) {
+			productUserRepository.deleteProductByUser(ProductUserEntity.builder()
+					.withUserId(userId)
+					.withProductId(productId)
+					.build());
+			return DeleteProductResponse.builder().withMessage("Le produit est supprimé").build();
+		}		
+		
+		// find productId in product_user  == 1 alors suppression du produit dans products et suppression du fichier		
+		storageService.deleteFile(product.getFileName());
+		productRepository.deleteProduct(productId);
+		return DeleteProductResponse.builder().withMessage("Le produit est supprimé").build();
+	}
+}

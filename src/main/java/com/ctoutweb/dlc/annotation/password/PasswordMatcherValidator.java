@@ -1,6 +1,6 @@
 package com.ctoutweb.dlc.annotation.password;
 
-import com.ctoutweb.dlc.model.RegisterRequest;
+import com.ctoutweb.dlc.model.auth.RegisterRequest;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

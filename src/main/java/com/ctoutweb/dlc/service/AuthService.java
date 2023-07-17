@@ -6,10 +6,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.ctoutweb.dlc.annotation.AnnotationValidator;
-import com.ctoutweb.dlc.model.LoginRequest;
-import com.ctoutweb.dlc.model.LoginResponse;
-import com.ctoutweb.dlc.model.RegisterRequest;
+import com.ctoutweb.dlc.model.auth.LoginRequest;
+import com.ctoutweb.dlc.model.auth.LoginResponse;
+import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.repository.UserRepository;
 import com.ctoutweb.dlc.security.UserPrincipal;
 import com.ctoutweb.dlc.security.token.JwtIssuer;

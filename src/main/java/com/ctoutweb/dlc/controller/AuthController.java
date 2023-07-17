@@ -3,16 +3,15 @@ package com.ctoutweb.dlc.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ctoutweb.dlc.annotation.AnnotationValidator;
-import com.ctoutweb.dlc.model.LoginRequest;
-import com.ctoutweb.dlc.model.LoginResponse;
-import com.ctoutweb.dlc.model.RegisterRequest;
+import com.ctoutweb.dlc.model.auth.LoginRequest;
+import com.ctoutweb.dlc.model.auth.LoginResponse;
+import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.service.AuthService;
 
 @RestController

@@ -8,20 +8,26 @@ public class FriendEntity {
 	private int userId;
 	private int friendId;
 	private String nickname;
-	private Boolean isFriendRequestView;
+	private Boolean isFriendRequestNew;
 	private Boolean isFriendRequestAccepted;
 	private Boolean isRelationAccepeted;
+	private Boolean isRelationDeleted;
 	private Date createdAt;
 	private Date updatedAt;
+	
+	public FriendEntity() {
+		
+	}
 	
 	private FriendEntity(Builder builder) {
 		this.id = builder.id;
 		this.userId = builder.userId;
 		this.friendId = builder.friendId;
 		this.nickname = builder.nickname;
-		this.isFriendRequestView = builder.isFriendRequestView;
+		this.isFriendRequestNew = builder.isFriendRequestNew;
 		this.isFriendRequestAccepted = builder.isFriendRequestAccepted;
 		this.isRelationAccepeted = builder.isRelationAccepeted;
+		this.isRelationDeleted = builder.isRelationDeleted;
 		this.createdAt = builder.createdAt;
 		this.updatedAt = builder.updatedAt;
 	}
@@ -76,14 +82,14 @@ public class FriendEntity {
 	/**
 	 * @return the isFriendRequestView
 	 */
-	public Boolean getIsFriendRequestView() {
-		return isFriendRequestView;
+	public Boolean getisFriendRequestNew() {
+		return isFriendRequestNew;
 	}
 	/**
 	 * @param isFriendRequestView the isFriendRequestView to set
 	 */
-	public void setIsFriendRequestView(Boolean isFriendRequestView) {
-		this.isFriendRequestView = isFriendRequestView;
+	public void setisFriendRequestNew(Boolean isFriendRequestNew) {
+		this.isFriendRequestNew = isFriendRequestNew;
 	}
 	/**
 	 * @return the isFriendRequestAccepted
@@ -109,6 +115,14 @@ public class FriendEntity {
 	public void setIsRelationAccepeted(Boolean isRelationAccepeted) {
 		this.isRelationAccepeted = isRelationAccepeted;
 	}
+	public Boolean getIsRelationDeleted() {
+		return isRelationDeleted;
+	}
+
+	public void setIsRelationDeleted(Boolean isRelationDeleted) {
+		this.isRelationDeleted = isRelationDeleted;
+	}
+
 	/**
 	 * @return the createdAt
 	 */
@@ -135,7 +149,7 @@ public class FriendEntity {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, id, isFriendRequestAccepted, isFriendRequestView, isRelationAccepeted, nickname,
+		return Objects.hash(createdAt, id, isFriendRequestAccepted, isFriendRequestNew, isRelationAccepeted, nickname,
 				friendId, updatedAt, userId);
 	}
 	@Override
@@ -149,7 +163,7 @@ public class FriendEntity {
 		FriendEntity other = (FriendEntity) obj;
 		return Objects.equals(createdAt, other.createdAt) && id == other.id
 				&& Objects.equals(isFriendRequestAccepted, other.isFriendRequestAccepted)
-				&& Objects.equals(isFriendRequestView, other.isFriendRequestView)
+				&& Objects.equals(isFriendRequestNew, other.isFriendRequestNew)
 				&& Objects.equals(isRelationAccepeted, other.isRelationAccepeted)
 				&& Objects.equals(nickname, other.nickname) && friendId == other.friendId
 				&& Objects.equals(updatedAt, other.updatedAt) && userId == other.userId;
@@ -157,7 +171,7 @@ public class FriendEntity {
 	@Override
 	public String toString() {
 		return "FriendEntity [id=" + id + ", user_id=" + userId + ", product_id=" + friendId + ", nickname="
-				+ nickname + ", isFriendRequestView=" + isFriendRequestView + ", isFriendRequestAccepted="
+				+ nickname + ", isFriendRequestNew=" + isFriendRequestNew + ", isFriendRequestAccepted="
 				+ isFriendRequestAccepted + ", isRelationAccepeted=" + isRelationAccepeted + ", createdAt=" + createdAt
 				+ ", updatedAt=" + updatedAt + "]";
 	}
@@ -171,9 +185,10 @@ public class FriendEntity {
 		private int userId;
 		private int friendId;
 		private String nickname;
-		private Boolean isFriendRequestView;
+		private Boolean isFriendRequestNew;
 		private Boolean isFriendRequestAccepted;
 		private Boolean isRelationAccepeted;
+		private Boolean isRelationDeleted;
 		private Date createdAt;
 		private Date updatedAt;
 
@@ -200,8 +215,8 @@ public class FriendEntity {
 			return this;
 		}
 
-		public Builder withIsFriendRequestView(Boolean isFriendRequestView) {
-			this.isFriendRequestView = isFriendRequestView;
+		public Builder withIsFriendRequestNew(Boolean isFriendRequestNew) {
+			this.isFriendRequestNew = isFriendRequestNew;
 			return this;
 		}
 
@@ -212,6 +227,11 @@ public class FriendEntity {
 
 		public Builder withIsRelationAccepeted(Boolean isRelationAccepeted) {
 			this.isRelationAccepeted = isRelationAccepeted;
+			return this;
+		}
+		
+		public Builder withIsRelationDeleted(Boolean isRelationDeleted) {
+			this.isRelationDeleted = isRelationDeleted;
 			return this;
 		}
 

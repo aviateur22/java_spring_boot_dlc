@@ -3,6 +3,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/dlc
     username: admin
     password: admin
+    
+spring.mvc.format.date: yyyy-MM-dd
+spring.mvc.format.date-time: yyyy-MM-dd HH:mm:ss
+spring.mvc.format.time: HH:mm:ss
+
 logging.level.org.springframework.web: DEBUG
 
 jwt.secret-key: jfldsjflmkdsflmdfhpidhfpdjfdsf*ôpeepîr^r454354343qdsqdqdd44254

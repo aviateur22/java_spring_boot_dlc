@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.model;
+package com.ctoutweb.dlc.model.friend;
 
 import java.util.Objects;
 

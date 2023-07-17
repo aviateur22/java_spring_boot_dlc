@@ -3,7 +3,6 @@ package com.ctoutweb.dlc.repository;
 import java.util.Optional;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ctoutweb.dlc.entity.RoleUserEntity;
-import com.ctoutweb.dlc.model.RegisterRequest;
 import com.ctoutweb.dlc.model.User;
+import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.security.Role;
 
 @Repository
@@ -59,6 +58,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		return this.getKeyHolderId();
 	}
 
+	@SuppressWarnings("null")
 	@Override	
 	public Optional<User> findUserById(int userId) {
 		try {
@@ -75,8 +75,8 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					.build(), userId);
 			
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
-			findUser.setFriends(friendRepository.findFriendByUserId(userId));
-			findUser.setProducts(productRepository.findProductByUserId(userId));
+			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
+			findUser.setProducts(productRepository.findProductsByUserId(userId));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -84,6 +84,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		}
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public Optional<User> findUserByEmail(String email) {
 		try {

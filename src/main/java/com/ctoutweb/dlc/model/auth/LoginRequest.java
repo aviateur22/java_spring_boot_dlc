@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.model;
+package com.ctoutweb.dlc.model.auth;
 
 import java.util.Objects;
 
