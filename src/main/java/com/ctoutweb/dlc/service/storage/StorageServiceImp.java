@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 import org.springframework.core.io.Resource;
@@ -84,6 +85,28 @@ public class StorageServiceImp implements StorageService {
 			     throw new RuntimeException(e.getMessage());
 			}
 		}
+	}
+	
+	public String getImageInBase64Format(String fileName) {			
+		try {
+			Path filePath = this.root.resolve(fileName);	
+			byte[] imageByte = Files.readAllBytes(filePath);			
+			return Base64.getEncoder().encodeToString(imageByte);
+			
+		} catch(Exception ex) {
+			if(ex instanceof FileException) {	
+				return "";				
+				
+			} else if(ex instanceof NoSuchFileException) {				
+				return "";
+				
+			} else if(ex instanceof IOException)  {							
+				throw new FileException(ex.getMessage());
+				
+			} else {				
+				throw new FileException(ex.getMessage());
+			}
+		}		
 	}
 	
 	@SuppressWarnings("null")

@@ -7,10 +7,22 @@ public class Product {
 	private int id;
 	private int userId;
 	private String path;
+	private String fileName;
+	private String imageBase64;
 	private Date productEndDate;
 	private Date productOpenDate;
 	private Date createdAt;
 
+	public Product(Builder builder) {
+		this.id = builder.id;
+		this.userId = builder.userId;
+		this.path = builder.path;
+		this.fileName = builder.fileName;
+		this.imageBase64 = builder.imageBase64;
+		this.productEndDate = builder.productEndDate;
+		this.productOpenDate = builder.productOpenDate;
+		this.createdAt = builder.createdAt;		
+	}
 	
 	
 	/**
@@ -47,6 +59,24 @@ public class Product {
 	 */
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+
+	public String getImageBase64() {
+		return imageBase64;
+	}
+
+	public void setImageBase64(String imageBase64) {
+		this.imageBase64 = imageBase64;
 	}
 
 	/**
@@ -124,19 +154,13 @@ public class Product {
 		return new Builder();
 	}
 	
-	public Product(Builder builder) {
-		this.id = builder.id;
-		this.userId = builder.userId;
-		this.path = builder.path;		
-		this.productEndDate = builder.productEndDate;
-		this.productOpenDate = builder.productOpenDate;
-		this.createdAt = builder.createdAt;		
-	}
 	
 	public static final class Builder {
 		private int id;
 		private int userId;
-		private String path;		
+		private String path;
+		private String fileName;
+		private String imageBase64;
 		private Date productEndDate;
 		private Date productOpenDate;
 		private Date createdAt;		
@@ -159,6 +183,10 @@ public class Product {
 			return this;
 		}
 		
+		public Builder withFileName(String fileName) {
+			this.fileName = fileName;
+			return this;
+		}
 
 		public Builder withProductEndDate(Date productEndDate) {
 			this.productEndDate = productEndDate;
@@ -167,6 +195,11 @@ public class Product {
 
 		public Builder withProductOpenDate(Date productOpenDate) {
 			this.productOpenDate = productOpenDate;
+			return this;
+		}
+		
+		public Builder withImageBase64(String imageBase64) {
+			this.imageBase64 = imageBase64;
 			return this;
 		}
 

@@ -19,18 +19,22 @@ import com.ctoutweb.dlc.entity.ProductUserEntity;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.Friend;
 import com.ctoutweb.dlc.model.Product;
+import com.ctoutweb.dlc.model.User;
+import com.ctoutweb.dlc.service.storage.StorageService;
 
 @Repository
 public class ProductRepositoryImp extends IdKeyHolder implements ProductRepository {
 	private final JdbcTemplate jdbcTemplate;
 	private final ProductUserRepository productUserRepository;
 	private final NamedParameterJdbcTemplate namedParamJdbcTemplate;
-
-	public ProductRepositoryImp(JdbcTemplate jdbcTemplate, ProductUserRepository productUserRepository, NamedParameterJdbcTemplate namedParamJdbcTemplate) {
+	private final StorageService storageService;
+	
+	public ProductRepositoryImp(JdbcTemplate jdbcTemplate, ProductUserRepository productUserRepository, NamedParameterJdbcTemplate namedParamJdbcTemplate, StorageService storageService) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.productUserRepository = productUserRepository;
 		this.namedParamJdbcTemplate = namedParamJdbcTemplate;
+		this.storageService = storageService;
 	}
 
 	@Override
@@ -46,7 +50,18 @@ public class ProductRepositoryImp extends IdKeyHolder implements ProductReposito
 		String query = "SELECT * FROM products WHERE products.id IN (:ids)";
 		SqlParameterSource sqlParam = new MapSqlParameterSource("ids", productListId);
 		
-		return namedParamJdbcTemplate.query(query, sqlParam, BeanPropertyRowMapper.newInstance(Product.class));
+		return namedParamJdbcTemplate.query(query, sqlParam, 
+				(rs, rowNum)->Product.builder()
+					.withId(rs.getInt("id"))
+					.withUserId(rs.getInt("user_id"))
+					.withFileName(rs.getString("file_name"))
+					.withImageBase64(storageService.getImageInBase64Format(rs.getString("file_name")))
+					.withPath(rs.getString("path"))					
+					.withCreatedAt(rs.getTimestamp("created_at"))
+					.withProductOpenDate(rs.getTimestamp("product_open_date"))					
+					.withProductEndDate(rs.getTimestamp("product_end_date"))
+					.build());
+		//return namedParamJdbcTemplate.query(query, sqlParam, BeanPropertyRowMapper.newInstance(Product.class));
 		
 	}
 

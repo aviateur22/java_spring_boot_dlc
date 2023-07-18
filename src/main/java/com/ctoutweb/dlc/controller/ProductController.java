@@ -55,5 +55,9 @@ public class ProductController {
 		DeleteProductResponse response = productService.deleteProductById(id, user.getId());
 		return new ResponseEntity<DeleteProductResponse>(response, HttpStatus.OK);
 	}
+	
+	public ResponseEntity<String> getProductImage(){
+		return null;
+	}
 
 }
