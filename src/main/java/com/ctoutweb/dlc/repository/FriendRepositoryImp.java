@@ -120,7 +120,7 @@ public class FriendRepositoryImp extends IdKeyHolder implements FriendsRepositor
 	@Override
 	public List<Friend> findFriendByUserIdWithRelationAccepted(int userId) {
 		String query = "SELECT "
-				+ "f.id, f.friend_id, f.nickname, f.is_friend_request_new, f.is_friend_request_accepted, f.is_relation_accepted, f.is_relation_deleted"
+				+ "f.id, f.friend_id, f.nickname, f.is_friend_request_new, f.is_friend_request_accepted, f.is_relation_accepted, f.is_relation_deleted, "
 				+ "f.created_at AS friendCreatedAt, u.email, u.created_at "
 				+ "FROM friends AS f "
 				+ "JOIN users AS u "

@@ -2,8 +2,18 @@ package com.ctoutweb.dlc.model.friend;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+
 public class UpdateFriendRelationRequest {
+	@NotNull(message = "le statut de la relation est obligatoire")
 	private boolean isFriendRequestAccepted;
+	
+	@NotNull(message = "l'identifiant de l'ami est obligatoire")
+	@Min(value = 1, message = "l'identifiant de l'ami est obligatoire")
+	@Positive(message = "l'identifiant de l'ami est obligatoire")
 	private int friendId;
 	/**
 	 * @return the isFriendRequestAccepted

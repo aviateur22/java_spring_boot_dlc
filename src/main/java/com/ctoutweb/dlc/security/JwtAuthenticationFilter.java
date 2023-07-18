@@ -10,6 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ctoutweb.dlc.security.token.JwtDecoder;
 import com.ctoutweb.dlc.security.token.JwtToUserPrincipalConverter;
+import com.ctoutweb.dlc.security.token.JwtValidity;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,11 +22,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private final JwtDecoder jwtDecoder;
 	private final JwtToUserPrincipalConverter jwtToUserPrincipal;
+	private final JwtValidity jwtValidity;
 
-	public JwtAuthenticationFilter(JwtDecoder jwtDecoder, JwtToUserPrincipalConverter jwtToUserPrincipal) {
+	public JwtAuthenticationFilter(JwtDecoder jwtDecoder, JwtToUserPrincipalConverter jwtToUserPrincipal, JwtValidity jwtValidity) {
 		super();
 		this.jwtDecoder = jwtDecoder;
 		this.jwtToUserPrincipal = jwtToUserPrincipal;
+		this.jwtValidity = jwtValidity;
 	}
 
 	@Override
@@ -33,10 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		extractTokenFromHeaders(request)
 		.map(token->jwtDecoder.decode(token))
-		.map(decodeJwt->jwtToUserPrincipal.convert(decodeJwt))
+		.map(decodeJwt->jwtValidity.validate(decodeJwt))
+		.map(decodeJwt->jwtToUserPrincipal.convert(decodeJwt))		
 		.map(userPrincipal->new UserPrincipalAutenticationToken(userPrincipal))
-		.ifPresent(auth->SecurityContextHolder.getContext().setAuthentication(auth));
-		
+		.ifPresent(auth->SecurityContextHolder.getContext().setAuthentication(auth));	
 		filterChain.doFilter(request, response);
 		
 	}
