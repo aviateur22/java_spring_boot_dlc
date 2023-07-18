@@ -19,7 +19,9 @@ import com.ctoutweb.dlc.exception.custom.AnnotationException;
 import com.ctoutweb.dlc.exception.custom.FileException;
 import com.ctoutweb.dlc.exception.custom.FriendNotFindException;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
+import com.ctoutweb.dlc.exception.custom.TokenException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
+import org.springframework.security.core.AuthenticationException;
 import com.ctoutweb.dlc.model.ErrorResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -96,5 +98,17 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(value = {TokenException.class})
+	public ResponseEntity<ErrorResponse>TokenException(TokenException ex, WebRequest request){
+		System.out.println("ici");
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	}
+	
+	@ExceptionHandler(value = {AuthenticationException.class})
+	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse("cette action est interite");
+		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	}
 	
 }

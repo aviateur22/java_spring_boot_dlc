@@ -17,6 +17,7 @@ public class FileNotNullValidator implements ConstraintValidator<FileNotNull, Mu
 	public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
 		
 		if(file.getSize() > 0 && !file.isEmpty()) {
+			System.out.println(file.getSize());
 			return true;
 		}		
 		

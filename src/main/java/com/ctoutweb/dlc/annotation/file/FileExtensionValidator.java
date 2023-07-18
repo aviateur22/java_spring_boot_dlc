@@ -24,6 +24,8 @@ public class FileExtensionValidator implements ConstraintValidator<FileExtension
 	@Override
 	public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {		
 		
+		if(file.isEmpty() || file.getSize() == 0) return false;
+		
 		boolean isFileValid = isFileExtensionValid(file);		
 		if(isFileValid) return true;
 		
@@ -43,12 +45,7 @@ public class FileExtensionValidator implements ConstraintValidator<FileExtension
 			fileStream.read(magicBytes);
 			fileStream.close();		
 			
-			switch(file.getContentType().toLowerCase()) {
-				case "application/pdf": {
-					if(!FileType.PDF.is(magicBytes)) return false;
-					return true;
-					
-				}			
+			switch(file.getContentType().toLowerCase()) {					
 				
 				case "image/png": {
 					if(!FileType.PNG.is(magicBytes)) return false;

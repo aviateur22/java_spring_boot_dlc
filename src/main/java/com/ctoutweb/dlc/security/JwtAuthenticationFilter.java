@@ -10,7 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ctoutweb.dlc.security.token.JwtDecoder;
 import com.ctoutweb.dlc.security.token.JwtToUserPrincipalConverter;
-import com.ctoutweb.dlc.security.token.JwtValidity;
+import com.ctoutweb.dlc.service.TokenService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,26 +22,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private final JwtDecoder jwtDecoder;
 	private final JwtToUserPrincipalConverter jwtToUserPrincipal;
-	private final JwtValidity jwtValidity;
+	private final TokenService tokenService;
 
-	public JwtAuthenticationFilter(JwtDecoder jwtDecoder, JwtToUserPrincipalConverter jwtToUserPrincipal, JwtValidity jwtValidity) {
+	public JwtAuthenticationFilter(JwtDecoder jwtDecoder, JwtToUserPrincipalConverter jwtToUserPrincipal, TokenService tokenService) {
 		super();
 		this.jwtDecoder = jwtDecoder;
 		this.jwtToUserPrincipal = jwtToUserPrincipal;
-		this.jwtValidity = jwtValidity;
+		this.tokenService = tokenService;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		extractTokenFromHeaders(request)
+			throws ServletException, IOException{
+		extractTokenFromHeaders(request)		
 		.map(token->jwtDecoder.decode(token))
-		.map(decodeJwt->jwtValidity.validate(decodeJwt))
 		.map(decodeJwt->jwtToUserPrincipal.convert(decodeJwt))		
-		.map(userPrincipal->new UserPrincipalAutenticationToken(userPrincipal))
-		.ifPresent(auth->SecurityContextHolder.getContext().setAuthentication(auth));	
+		.map(userPrincipal->new UserPrincipalAutenticationToken(userPrincipal))		
+		.ifPresent(auth->{
+			SecurityContextHolder.getContext().setAuthentication(auth);
+			this.validateJwt(request);
+		});
+		
+		
 		filterChain.doFilter(request, response);
 		
+	}
+	
+	private void validateJwt(HttpServletRequest request) {
+		UserPrincipal user = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String token = extractTokenFromHeaders(request).get();
+		tokenService.validateToken(token, user.getId());
 	}
 	
 	private Optional<String> extractTokenFromHeaders(HttpServletRequest request) {
