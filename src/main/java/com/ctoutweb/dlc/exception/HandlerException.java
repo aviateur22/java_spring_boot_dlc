@@ -13,6 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ctoutweb.dlc.exception.custom.AnnotationException;
 import com.ctoutweb.dlc.exception.custom.FileException;
@@ -76,8 +77,9 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(value = {TokenExpiredException.class})
+	@ExceptionHandler(value = {JWTVerificationException.class})
 	public ResponseEntity<ErrorResponse>TokenExpiredException(TokenExpiredException ex, WebRequest request){
+		System.out.println("ici");
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.FORBIDDEN);
 	}
@@ -93,4 +95,6 @@ public class HandlerException {
 		ErrorResponse error = new ErrorResponse("les données envoyées ne sont pas correctes");
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	
 }
