@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -19,7 +20,9 @@ import com.ctoutweb.dlc.exception.custom.AnnotationException;
 import com.ctoutweb.dlc.exception.custom.FileException;
 import com.ctoutweb.dlc.exception.custom.FriendNotFindException;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
+import com.ctoutweb.dlc.exception.custom.TokenException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
+import org.springframework.security.core.AuthenticationException;
 import com.ctoutweb.dlc.model.ErrorResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -96,5 +99,17 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(value = {TokenException.class})
+	public ResponseEntity<ErrorResponse>TokenException(TokenException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	}
+	
+	@ExceptionHandler(value = {AuthenticationException.class})
+	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
+		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
+		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	}
 	
 }

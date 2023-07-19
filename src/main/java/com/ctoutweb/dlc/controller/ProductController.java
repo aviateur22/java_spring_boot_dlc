@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,16 @@ public class ProductController {
 	int id, @AuthenticationPrincipal UserPrincipal user){
 		DeleteProductResponse response = productService.deleteProductById(id, user.getId());
 		return new ResponseEntity<DeleteProductResponse>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/{id}/image")
+	public ResponseEntity<String> getProductImage(@PathVariable("id") 
+	@NotNull (message = "l'identifiant du produit est obligatoire")
+	@Positive (message = "l'identifiant du produit est obligatoire")
+	@Min( value = 1, message = "l'identifiant du produit est obligatoire")
+	int id, @AuthenticationPrincipal UserPrincipal user) {
+		String image = productService.getImageForOneProduct(id);
+		return new ResponseEntity<String>(image, HttpStatus.OK);
 	}
 
 }

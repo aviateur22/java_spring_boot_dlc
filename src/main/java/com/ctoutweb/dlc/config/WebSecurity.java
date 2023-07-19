@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,6 +22,7 @@ public class WebSecurity {
 	
 	private final UserPrincipalDetailService userPrincipalDetailService;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final AuthenticationEntryPoint authenticationEntryPoint;
 	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,6 +31,7 @@ public class WebSecurity {
 		
 		http
 			.csrf(csrf->csrf.disable())
+			.exceptionHandling(exception->exception.authenticationEntryPoint(authenticationEntryPoint))
 			.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(login->login.disable())
 			.authorizeHttpRequests(httpRequest->httpRequest
@@ -38,10 +41,14 @@ public class WebSecurity {
 		return http.build();
 	}
 	
-	public WebSecurity(UserPrincipalDetailService userPrincipalDetailService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+	public WebSecurity(
+			UserPrincipalDetailService userPrincipalDetailService, 
+			JwtAuthenticationFilter jwtAuthenticationFilter, 
+			AuthenticationEntryPoint authenticationEntryPoint) {
 		super();
 		this.userPrincipalDetailService = userPrincipalDetailService;
 		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.authenticationEntryPoint = authenticationEntryPoint;
 	}
 
 	@Bean

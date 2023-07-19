@@ -61,7 +61,18 @@ public class ProductService {
 	}
 	
 	public List<Product> findProductsByUserId(int userId){
-		return productRepository.findProductsByUserId(userId);
+		List<Product> products = productRepository.findProductsByUserId(userId);
+		
+		List<Product> productsWithBaseImageInBase64 = products
+				.stream()
+				.map(product-> Product.builder()
+						.withImageBase64(storageService.getImageInBase64Format(product.getFileName())).build())
+				.collect(Collectors.toList());
+				
+				
+				
+		
+		return productsWithBaseImageInBase64;
 	}
 	
 	public DeleteProductResponse deleteProductById(int productId, int userId) {
@@ -81,5 +92,10 @@ public class ProductService {
 		storageService.deleteFile(product.getFileName());
 		productRepository.deleteProduct(productId);
 		return DeleteProductResponse.builder().withMessage("Le produit est supprimé").build();
+	}
+	
+	public String getImageForOneProduct(int productId) {
+		ProductEntity product = productRepository.findProductById(productId).orElseGet(()->ProductEntity.builder().withFileName("").build());		
+		return storageService.getImageInBase64Format(product.getFileName());
 	}
 }
