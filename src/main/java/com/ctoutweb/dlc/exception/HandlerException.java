@@ -100,8 +100,7 @@ public class HandlerException {
 	}
 	
 	@ExceptionHandler(value = {TokenException.class})
-	public ResponseEntity<ErrorResponse>TokenException(TokenException ex, WebRequest request){
-		System.out.println("ici");
+	public ResponseEntity<ErrorResponse>TokenException(TokenException ex, WebRequest request){	
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
 	}

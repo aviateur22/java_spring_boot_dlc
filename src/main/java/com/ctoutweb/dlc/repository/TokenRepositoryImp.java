@@ -81,8 +81,12 @@ public class TokenRepositoryImp extends IdKeyHolder implements TokenRepository {
 
 	@Override
 	public int deleteTokenByUserId(int userId) {
-		// TODO Auto-generated method stub
-		return 0;
+		String query = "DELETE FROM tokens WHERE user_id=?";
+		int rowDelete = jdbcTemplate.update(query, userId);
+		
+		if(rowDelete == 0) throw new InsertSQLException("erreur suppression token");
+		
+		return rowDelete;
 	}
 
 

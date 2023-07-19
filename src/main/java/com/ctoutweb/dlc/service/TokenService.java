@@ -45,7 +45,7 @@ public class TokenService {
 	}
 	
 	public void deleteToken(int userId) {		
-		
+		System.out.println("ic");
 		tokenRepository.findTokenByUserId(userId).ifPresentOrElse((findToken)->tokenRepository.deleteTokenByUserId(userId), null);		
 	}
 

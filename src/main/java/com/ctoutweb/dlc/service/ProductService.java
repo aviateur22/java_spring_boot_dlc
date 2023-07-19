@@ -93,4 +93,9 @@ public class ProductService {
 		productRepository.deleteProduct(productId);
 		return DeleteProductResponse.builder().withMessage("Le produit est supprimé").build();
 	}
+	
+	public String getImageForOneProduct(int productId) {
+		ProductEntity product = productRepository.findProductById(productId).orElseGet(()->ProductEntity.builder().withFileName("").build());		
+		return storageService.getImageInBase64Format(product.getFileName());
+	}
 }

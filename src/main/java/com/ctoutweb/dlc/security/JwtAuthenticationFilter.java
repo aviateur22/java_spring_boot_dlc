@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 	}
 	
-	private void validateJwt(HttpServletRequest request) {
+	private void validateJwt(HttpServletRequest request) {		
 		UserPrincipal user = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String token = extractTokenFromHeaders(request).get();
 		tokenService.validateToken(token, user.getId());

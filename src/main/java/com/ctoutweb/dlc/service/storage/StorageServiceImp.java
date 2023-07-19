@@ -95,16 +95,16 @@ public class StorageServiceImp implements StorageService {
 			
 		} catch(Exception ex) {
 			if(ex instanceof FileException) {	
-				return "";				
+				return "no-file-data";				
 				
 			} else if(ex instanceof NoSuchFileException) {				
-				return "";
+				return "no-file-data";
 				
 			} else if(ex instanceof IOException)  {							
-				throw new FileException(ex.getMessage());
+				return "no-file-data";
 				
 			} else {				
-				throw new FileException(ex.getMessage());
+				return "no-file-data";
 			}
 		}		
 	}
