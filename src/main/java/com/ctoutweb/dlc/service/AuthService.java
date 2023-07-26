@@ -12,33 +12,46 @@ import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
+import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;
 import com.ctoutweb.dlc.repository.UserRepository;
 import com.ctoutweb.dlc.security.UserPrincipal;
 import com.ctoutweb.dlc.security.token.JwtIssuer;
+import com.ctoutweb.dlc.service.mail.MailService;
 
 @Service
 public class AuthService {	
 	
+	private final MailService mailService;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final JwtIssuer jwtIssuer;
+	
 
 	public AuthService(
 			UserRepository userRepository, 
 			AuthenticationManager authenticationManager, 
 			JwtIssuer jwtIssuer, 
 			TokenService tokenService, 
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder, 
+			MailService mailService) {
 		super();
+		this.mailService = mailService;
 		this.passwordEncoder = passwordEncoder;		
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 		this.tokenService = tokenService;
 		this.jwtIssuer = jwtIssuer;
+	}
+	
+	public RegisterMailingResponse registerMailingLink(RegisterMailingRequest request) {
+		mailService.sendEmail(request.getSubject(), request.getRecipientMail());
+		
+		return RegisterMailingResponse.builder().withMessage("ddd").build();
 	}
 
 	public RegisterResponse register(RegisterRequest request) {			
