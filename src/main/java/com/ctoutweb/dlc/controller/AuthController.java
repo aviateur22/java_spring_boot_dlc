@@ -3,7 +3,6 @@ package com.ctoutweb.dlc.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +17,6 @@ import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;
 import com.ctoutweb.dlc.security.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
-import com.ctoutweb.dlc.service.TokenService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
