@@ -35,7 +35,8 @@ public class WebSecurity {
 			.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(login->login.disable())
 			.authorizeHttpRequests(httpRequest->httpRequest
-					.requestMatchers("/api/v1/auth/**").permitAll()					
+					.requestMatchers("/api/v1/auth/**").permitAll()
+					.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 					.anyRequest().authenticated());
 			
 		return http.build();

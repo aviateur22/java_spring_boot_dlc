@@ -11,7 +11,6 @@ import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
-import com.ctoutweb.dlc.model.auth.LogoutRequest;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;

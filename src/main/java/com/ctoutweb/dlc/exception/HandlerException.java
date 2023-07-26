@@ -109,6 +109,7 @@ public class HandlerException {
 	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
 		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
 		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
+		ex.printStackTrace();
 		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
 	}
 	

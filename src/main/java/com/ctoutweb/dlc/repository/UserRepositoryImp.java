@@ -1,6 +1,8 @@
 package com.ctoutweb.dlc.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -109,5 +111,35 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return Optional.empty();
 		}
+	}
+
+	@Override
+	public List<User> findAllUsers() {
+		String userQuery = "SELECT * FROM users";			
+		List<User> findUsers = jdbcTemplate.query(userQuery, 
+				(rs, rowNum)->User.builder()
+				.withId(rs.getInt("id"))
+				.withEmail(rs.getString("email"))
+				.withPassword(rs.getString("password"))
+				.withLastLoginAt(rs.getTimestamp("last_login_at"))
+				.withCreatedAt(rs.getTimestamp("created_at"))
+				.withUpdatedAt(rs.getTimestamp("updated_at"))
+				.withIsAccountActive(rs.getBoolean("is_account_active"))
+				.build())
+		.stream()
+		.map(user->User.builder()
+				.withId(user.getId())
+				.withEmail(user.getEmail())
+				.withCreatedAt(user.getCreatedAt())
+				.withIsAccountActive(user.getIsAccountActive())
+				.withRoles(roleUserRepository.findUserRoleByUserId(user.getId()))
+				.withFriends(friendRepository.findFriendsByUserId(user.getId()))
+				.withProducts(productRepository.findProductsByUserId(user.getId()))
+				.build())
+		.collect(Collectors.toList());
+		
+		
+		
+		return findUsers;
 	}
 }
