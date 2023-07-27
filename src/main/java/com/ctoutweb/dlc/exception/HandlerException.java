@@ -17,6 +17,7 @@ import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ctoutweb.dlc.exception.custom.AnnotationException;
+import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.FileException;
 import com.ctoutweb.dlc.exception.custom.FriendNotFindException;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
@@ -81,10 +82,15 @@ public class HandlerException {
 	}
 	
 	@ExceptionHandler(value = {JWTVerificationException.class})
-	public ResponseEntity<ErrorResponse>TokenExpiredException(TokenExpiredException ex, WebRequest request){
-		System.out.println("ici");
+	public ResponseEntity<ErrorResponse>TokenExpiredException(TokenExpiredException ex, WebRequest request){		
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.FORBIDDEN);
+	}
+	
+	@ExceptionHandler(value = {EmailException.class})
+	public ResponseEntity<ErrorResponse>EmailException(EmailException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(value = {HttpMessageNotReadableException.class})

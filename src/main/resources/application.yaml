@@ -16,3 +16,11 @@ logging.level.org.springframework.web: DEBUG
 jwt.secret-key: jfldsjflmkdsflmdfhpidhfpdjfdsf*ôpeepîr^r454354343qdsqdqdd44254
 jwt.issuer: ctoutweb
 
+email.username: admin@ctoutweb.fr
+email.password: affirmer2011
+email.port: 587 
+email.host: mail.gandi.net
+email.smtp-auth: true
+email.smtp-starttls-enable: true
+
+aes.key: hjdfjkdhldhljdfldmùmddùPQdùmslqdf,msqnflnfclqdsfldqjfcbdqcnlfdqmfmsfùmsqdjmjffcsqfjqsdjqsqsm

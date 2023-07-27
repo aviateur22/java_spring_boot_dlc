@@ -13,8 +13,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.ctoutweb.dlc.security.JwtAuthenticationFilter;
-import com.ctoutweb.dlc.security.UserPrincipalDetailService;
+import com.ctoutweb.dlc.security.authentication.JwtAuthenticationFilter;
+import com.ctoutweb.dlc.security.authentication.UserPrincipalDetailService;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +23,16 @@ public class WebSecurity {
 	private final UserPrincipalDetailService userPrincipalDetailService;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
+	
+	public WebSecurity(
+			UserPrincipalDetailService userPrincipalDetailService, 
+			JwtAuthenticationFilter jwtAuthenticationFilter, 
+			AuthenticationEntryPoint authenticationEntryPoint) {
+		super();
+		this.userPrincipalDetailService = userPrincipalDetailService;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.authenticationEntryPoint = authenticationEntryPoint;
+	}
 	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,15 +52,6 @@ public class WebSecurity {
 		return http.build();
 	}
 	
-	public WebSecurity(
-			UserPrincipalDetailService userPrincipalDetailService, 
-			JwtAuthenticationFilter jwtAuthenticationFilter, 
-			AuthenticationEntryPoint authenticationEntryPoint) {
-		super();
-		this.userPrincipalDetailService = userPrincipalDetailService;
-		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-		this.authenticationEntryPoint = authenticationEntryPoint;
-	}
 
 	@Bean
 	PasswordEncoder passwordEncode() {

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ctoutweb.dlc.entity.RoleUserEntity;
 import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
-import com.ctoutweb.dlc.security.Role;
+import com.ctoutweb.dlc.security.authentication.Role;
 
 @Repository
 public class UserRepositoryImp extends IdKeyHolder implements UserRepository{

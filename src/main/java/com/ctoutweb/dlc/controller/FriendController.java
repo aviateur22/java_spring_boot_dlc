@@ -17,8 +17,8 @@ import com.ctoutweb.dlc.model.friend.AddFriendRequest;
 import com.ctoutweb.dlc.model.friend.AddFriendResponse;
 import com.ctoutweb.dlc.model.friend.DeleteFriendResponse;
 import com.ctoutweb.dlc.model.friend.UpdateFriendResponse;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.model.friend.UpdateFriendRelationRequest;
-import com.ctoutweb.dlc.security.UserPrincipal;
 import com.ctoutweb.dlc.service.FriendService;
 
 import jakarta.validation.constraints.Min;

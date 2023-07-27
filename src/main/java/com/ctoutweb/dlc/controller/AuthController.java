@@ -13,9 +13,11 @@ import com.ctoutweb.dlc.annotation.AnnotationValidator;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
+import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
 
 @RestController
@@ -40,8 +42,13 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
 		annotationValidtorLogin.validate(request);
-		return new ResponseEntity<LoginResponse>(authService.authenticate(request), HttpStatus.OK);
-		
+		return new ResponseEntity<LoginResponse>(authService.authenticate(request), HttpStatus.OK);		
+	}
+	
+	@PostMapping("/register-mailing")
+	public ResponseEntity<RegisterMailingResponse> registerMailingLink(@RequestBody RegisterMailingRequest request) {
+		RegisterMailingResponse response = authService.registerMailingLink(request);
+		return new ResponseEntity<RegisterMailingResponse>(response, HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/register")
