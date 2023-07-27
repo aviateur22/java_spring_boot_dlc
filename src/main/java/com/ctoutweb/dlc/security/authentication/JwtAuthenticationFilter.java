@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.security;
+package com.ctoutweb.dlc.security.authentication;
 
 import java.io.IOException;
 import java.util.Optional;

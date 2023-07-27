@@ -13,7 +13,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.properties.JwtProperties;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 
 @Component
 public class JwtIssuer {

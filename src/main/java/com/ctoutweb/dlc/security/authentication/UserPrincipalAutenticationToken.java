@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.security;
+package com.ctoutweb.dlc.security.authentication;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 

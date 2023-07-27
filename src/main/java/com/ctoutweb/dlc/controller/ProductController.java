@@ -16,7 +16,7 @@ import com.ctoutweb.dlc.annotation.AnnotationValidator;
 import com.ctoutweb.dlc.model.product.DeleteProductResponse;
 import com.ctoutweb.dlc.model.product.SaveProductRequest;
 import com.ctoutweb.dlc.model.product.SaveProductResponse;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.ProductService;
 
 import jakarta.validation.constraints.Min;

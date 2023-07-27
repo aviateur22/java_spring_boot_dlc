@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.security;
+package com.ctoutweb.dlc.security.authentication;
 
 public enum Role {
 	ADMIN(1), USER(2);

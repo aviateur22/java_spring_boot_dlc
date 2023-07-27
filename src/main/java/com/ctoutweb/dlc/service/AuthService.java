@@ -1,5 +1,14 @@
 package com.ctoutweb.dlc.service;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,7 +26,8 @@ import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;
 import com.ctoutweb.dlc.repository.UserRepository;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.AesEncryption;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.security.token.JwtIssuer;
 import com.ctoutweb.dlc.service.mail.MailService;
 
@@ -30,6 +40,7 @@ public class AuthService {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final JwtIssuer jwtIssuer;
+	private final AesEncryption aesEncryption;
 	
 
 	public AuthService(
@@ -38,7 +49,8 @@ public class AuthService {
 			JwtIssuer jwtIssuer, 
 			TokenService tokenService, 
 			PasswordEncoder passwordEncoder, 
-			MailService mailService) {
+			MailService mailService, 
+			AesEncryption aesEncryption) {
 		super();
 		this.mailService = mailService;
 		this.passwordEncoder = passwordEncoder;		
@@ -46,11 +58,40 @@ public class AuthService {
 		this.userRepository = userRepository;
 		this.tokenService = tokenService;
 		this.jwtIssuer = jwtIssuer;
+		this.aesEncryption = aesEncryption;
 	}
 	
 	public RegisterMailingResponse registerMailingLink(RegisterMailingRequest request) {
-		mailService.sendEmail(request.getSubject(), request.getRecipientMail());
+		try {
+			String encryptData = aesEncryption.encrypt("sdsdsdsdsdsdsfdfdfdfdffd fjldjdgmfgfmgfmdgkfdgkfdgkmfd jdfdfkdfkdfkdùkggùmfgkfsg dmùkgùfgkfkgfùgkfùgkfgfgkfgkfùgkfùdgkfùg ùfgkfgfd*g*fgkù*dfgkdg");
+			String decryptData = aesEncryption.decrypt(encryptData);
+			System.out.println(encryptData);
+			System.out.println(decryptData);
+			
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidAlgorithmParameterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
 		
+		mailService.sendEmail(request.getSubject(), request.getRecipientMail());			
 		return RegisterMailingResponse.builder().withMessage("ddd").build();
 	}
 

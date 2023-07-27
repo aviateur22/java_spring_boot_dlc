@@ -17,7 +17,7 @@ import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
 import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
 import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.model.auth.RegisterResponse;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
 
 @RestController

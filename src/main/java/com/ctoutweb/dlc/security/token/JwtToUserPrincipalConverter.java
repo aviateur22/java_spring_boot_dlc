@@ -6,7 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.ctoutweb.dlc.security.UserPrincipal;
+import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 
 @Component
 public class JwtToUserPrincipalConverter {

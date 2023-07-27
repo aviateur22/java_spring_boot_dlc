@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Random;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class HtmlTemplateService {
 		
 		EmailTemplateInformation emailTemplateInformation = getTemplateInformation(subject);			    
 		InputStream fileStream = new ClassPathResource(emailTemplateInformation.getTemplatePath()).getInputStream();
-		String content = this.readFromInputStream(fileStream);		
+		String content = this.readFromInputStream(fileStream).replace("!%!token!%!", "");		
 		emailTemplateInformation.setTemplateContent(content);		
 		return emailTemplateInformation;
 	}
@@ -38,7 +39,9 @@ public class HtmlTemplateService {
 	private EmailTemplateInformation getTemplateInformation(EmailSubject subject) {
 		
 		switch (subject) {
-		case REGISTER :			
+		case REGISTER :		    
+			String randomToken = this.generateRandom();
+			System.out.println(randomToken);
 			return EmailTemplateInformation.builder()
 					.withSubject("inscription à dlc")
 					.withTemplatePath("templates/html/registerLink.html")
@@ -51,5 +54,16 @@ public class HtmlTemplateService {
 		default:
 			throw new IllegalArgumentException("Unexpected value: ");
 		}
+	}	
+	
+	private String generateRandom() {
+		Random rand = new Random();
+		String str = rand.ints(48, 123)
+				.filter(num->(num < 58 || num > 64) && (num < 91 || num > 96))
+				.limit(5)
+				.mapToObj(c->(char) c).collect(StringBuffer::new , StringBuffer::append, StringBuffer::append)
+				.toString();
+		
+		return str.toLowerCase();
 	}
 }
