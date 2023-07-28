@@ -20,6 +20,10 @@ import com.ctoutweb.dlc.security.authentication.Role;
 @Repository
 public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 	
+	// 1 vérifier existence email
+	// 2 ajouter email en bdd
+	// 3 
+	
 	private final JdbcTemplate jdbcTemplate;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate; 
 	private final RoleUserRepository roleUserRepository;

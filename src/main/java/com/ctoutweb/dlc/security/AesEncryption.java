@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -20,7 +21,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Component;
 
+
 import com.ctoutweb.dlc.properties.AesProperties;
+
 
 @Component
 public class AesEncryption {
@@ -28,7 +31,8 @@ public class AesEncryption {
 	private final AesProperties aesProperties;
 	String algorithm = "AES/CBC/PKCS5Padding";
 	String salt = "fdgfggbhh";
-	IvParameterSpec iv = generateIv();
+	//IvParameterSpec iv = generateIv();
+	byte[] iv = generateRandomByte();
     
     public AesEncryption(AesProperties aesProperties) {
 		super();
@@ -43,20 +47,37 @@ public class AesEncryption {
 	    return secret;
 	}
 	
-	private IvParameterSpec generateIv() {
+	private byte[] generateRandomByte() {
 	    byte[] iv = new byte[16];
 	    new SecureRandom().nextBytes(iv);
-	    return new IvParameterSpec(iv);
+	    return iv;
+	}   
+	
+	private IvParameterSpec generateParameterSpecIv(byte[] bytes) {	        
+	    return new IvParameterSpec(bytes);
 	}
 	
-    
-
 	public String encrypt(String text) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		Cipher cipher = Cipher.getInstance(this.algorithm);
 		SecretKey key = this.generateSecretKey();
 		System.out.println(iv);
-		cipher.init(Cipher.ENCRYPT_MODE,key, this.iv);
-		byte[] cipherText = cipher.doFinal(text.getBytes());		
+		cipher.init(Cipher.ENCRYPT_MODE,key, this.generateParameterSpecIv(iv));
+		byte[] cipherText = cipher.doFinal(text.getBytes());	
+	    return Base64.getEncoder()
+	        .encodeToString(cipherText);
+		
+	}
+	
+
+	public String encryptArray(String[] array) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+		Cipher cipher = Cipher.getInstance(this.algorithm);
+		SecretKey key = this.generateSecretKey();		
+		String d = String.join(",", array);
+		
+		System.out.println("byte array = " + Arrays.toString(iv));
+		System.out.println("IvParameterSpec = " + this.generateParameterSpecIv(iv));
+		cipher.init(Cipher.ENCRYPT_MODE,key, this.generateParameterSpecIv(iv));
+		byte[] cipherText = cipher.doFinal(d.getBytes());		
 	    return Base64.getEncoder()
 	        .encodeToString(cipherText);
 		
@@ -67,9 +88,9 @@ public class AesEncryption {
 		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		
 			SecretKey key = this.generateSecretKey();
-			System.out.println(iv);
+			System.out.println("byte array = " + iv);
 		    Cipher cipher = Cipher.getInstance(algorithm);
-		    cipher.init(Cipher.DECRYPT_MODE, key, this.iv);
+		    cipher.init(Cipher.DECRYPT_MODE, key, this.generateParameterSpecIv(iv));
 		    byte[] plainText = cipher.doFinal(Base64.getDecoder()
 		        .decode(cipherText));
 		    return new String(plainText);

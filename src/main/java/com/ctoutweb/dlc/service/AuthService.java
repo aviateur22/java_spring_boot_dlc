@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Collection;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.model.TokenIssue;
+import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
@@ -63,10 +65,18 @@ public class AuthService {
 	
 	public RegisterMailingResponse registerMailingLink(RegisterMailingRequest request) {
 		try {
-			String encryptData = aesEncryption.encrypt("sdsdsdsdsdsdsfdfdfdfdffd fjldjdgmfgfmgfmdgkfdgkfdgkmfd jdfdfkdfkdfkdùkggùmfgkfsg dmùkgùfgkfkgfùgkfùgkfgfgkfgkfùgkfùdgkfùg ùfgkfgfd*g*fgkù*dfgkdg");
+			String user = User.builder().withId(1).build().toString();
+			
+			String[] imageName = new String[] {"avion", "ciseau", "poile"};
+			
+			//String encryptData = aesEncryption.encrypt(imageName);
+			String encryptData = aesEncryption.encryptArray(imageName);
 			String decryptData = aesEncryption.decrypt(encryptData);
+			String[] data = decryptData.split(",");
+			
 			System.out.println(encryptData);
 			System.out.println(decryptData);
+			System.out.println(data[1]);
 			
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
@@ -91,7 +101,7 @@ public class AuthService {
 			e.printStackTrace();
 		}	
 		
-		mailService.sendEmail(request.getSubject(), request.getRecipientMail());			
+		//mailService.sendEmail(request.getSubject(), request.getRecipientMail());			
 		return RegisterMailingResponse.builder().withMessage("ddd").build();
 	}
 
