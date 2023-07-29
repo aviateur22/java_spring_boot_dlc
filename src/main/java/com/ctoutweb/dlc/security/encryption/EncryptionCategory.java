@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum EncryptionCategory {
-	REGISTEREMAIL(1),
-	RESETPASSWORD(2),
-	RANDOMWORD(3);
+	RANDOMREGISTEREMAIL(1),
+	RANDOMRESETPASSWORD(2),
+	RANDOMACCOUNTACTIVATION(3),
+	RANDOMWORD(4);
 	
 	private final int categoryValue;
 	
