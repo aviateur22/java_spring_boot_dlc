@@ -13,46 +13,45 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ctoutweb.dlc.entity.RoleUserEntity;
+import com.ctoutweb.dlc.entity.UserEntity;
+import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.User;
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.security.authentication.Role;
 
 @Repository
-public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
-	
-	// 1 vérifier existence email
-	// 2 ajouter email en bdd
-	// 3 
+public class UserRepositoryImp extends IdKeyHolder implements UserRepository{	
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate; 
 	private final RoleUserRepository roleUserRepository;
 	private final ProductRepository productRepository;
 	private final FriendsRepository friendRepository;
-	
+	private final AccountRepository accountRepository;
 
 	public UserRepositoryImp(JdbcTemplate jdbcTemplate, 
 			RoleUserRepository roleUserRepository, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate, 
 			ProductRepository productRepository, 
-			FriendsRepository friendRepository) {
+			FriendsRepository friendRepository, 
+			AccountRepository accountRepository) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 		this.roleUserRepository = roleUserRepository;
 		this.productRepository = productRepository;
 		this.friendRepository = friendRepository;
+		this.accountRepository = accountRepository;
 	}
 
 	@Override
 	@Transactional
-	public int saveUser(RegisterRequest user) {		
+	public int saveUser(UserEntity user) {		
 		
 		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(user);		
-		String userQuery = "INSERT INTO users (email, password) VALUES (:email, :password)";		
+		String userQuery = "INSERT INTO users (email) VALUES (:email)";		
 		int insertRow = namedParameterJdbcTemplate.update(userQuery, sqlParam, this.keyHolder);		
 		
-		if(this.isKeyHolderOrInsertRowUnvalid(insertRow)) throw new RuntimeException("probleme insertion user");
+		if(this.isKeyHolderOrInsertRowUnvalid(insertRow)) throw new InsertSQLException("probleme insertion user");
 		
 		RoleUserEntity addUserRole = RoleUserEntity.builder()
 				.withRoleId(Role.ADMIN.getValue())
@@ -73,13 +72,10 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)->User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withPassword(rs.getString("password"))
-					.withLastLoginAt(rs.getTimestamp("last_login_at"))
-					.withCreatedAt(rs.getTimestamp("created_at"))
-					.withUpdatedAt(rs.getTimestamp("updated_at"))
-					.withIsAccountActive(rs.getBoolean("is_account_active"))
+					.withIsAccountCreated(rs.getBoolean("isAccountCreated"))
 					.build(), userId);
 			
+			findUser.setAccount(accountRepository.findAccountById(userId).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
 			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
 			findUser.setProducts(productRepository.findProductsByUserId(userId));
@@ -100,17 +96,12 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)-> User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withPassword(rs.getString("password"))
-					.withLastLoginAt(rs.getTimestamp("last_login_at"))
-					.withCreatedAt(rs.getTimestamp("created_at"))
-					.withUpdatedAt(rs.getTimestamp("updated_at"))
-					.withIsAccountActive(rs.getBoolean("is_account_active"))
+					.withIsAccountCreated(rs.getBoolean("isAccountCreated"))					
 					.build(),
-					email);
-			
-			
+					email);			
+			findUser.setAccount(accountRepository.findAccountById(findUser.getId()).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(findUser.getId()));
-			System.out.println(findUser);
+			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return Optional.empty();
@@ -124,18 +115,13 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 				(rs, rowNum)->User.builder()
 				.withId(rs.getInt("id"))
 				.withEmail(rs.getString("email"))
-				.withPassword(rs.getString("password"))
-				.withLastLoginAt(rs.getTimestamp("last_login_at"))
-				.withCreatedAt(rs.getTimestamp("created_at"))
-				.withUpdatedAt(rs.getTimestamp("updated_at"))
-				.withIsAccountActive(rs.getBoolean("is_account_active"))
+				.withIsAccountCreated(rs.getBoolean("isAccountCreated"))
 				.build())
 		.stream()
 		.map(user->User.builder()
 				.withId(user.getId())
 				.withEmail(user.getEmail())
-				.withCreatedAt(user.getCreatedAt())
-				.withIsAccountActive(user.getIsAccountActive())
+				.withAccount(accountRepository.findAccountById(user.getId()).orElse(null))
 				.withRoles(roleUserRepository.findUserRoleByUserId(user.getId()))
 				.withFriends(friendRepository.findFriendsByUserId(user.getId()))
 				.withProducts(productRepository.findProductsByUserId(user.getId()))

@@ -9,6 +9,7 @@ import java.util.Collection;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.management.RuntimeErrorException;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,21 +18,25 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ctoutweb.dlc.entity.UserEntity;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
+import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
+import com.ctoutweb.dlc.model.auth.CreateAccountResponse;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
 import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
 import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
-import com.ctoutweb.dlc.model.auth.RegisterResponse;
+import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
+import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
 import com.ctoutweb.dlc.repository.UserRepository;
-import com.ctoutweb.dlc.security.AesEncryption;
 import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.security.token.JwtIssuer;
+import com.ctoutweb.dlc.service.mail.EmailSubject;
 import com.ctoutweb.dlc.service.mail.MailService;
+import com.ctoutweb.dlc.service.random.RandomImageService;
 
 @Service
 public class AuthService {	
@@ -42,7 +47,8 @@ public class AuthService {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final JwtIssuer jwtIssuer;
-	private final AesEncryption aesEncryption;
+	private final AesEncryptionService aesEncryption;
+	private final RandomImageService randomImageService;
 	
 
 	public AuthService(
@@ -52,7 +58,8 @@ public class AuthService {
 			TokenService tokenService, 
 			PasswordEncoder passwordEncoder, 
 			MailService mailService, 
-			AesEncryption aesEncryption) {
+			AesEncryptionService aesEncryption, 
+			RandomImageService randomImageService) {
 		super();
 		this.mailService = mailService;
 		this.passwordEncoder = passwordEncoder;		
@@ -61,6 +68,7 @@ public class AuthService {
 		this.tokenService = tokenService;
 		this.jwtIssuer = jwtIssuer;
 		this.aesEncryption = aesEncryption;
+		this.randomImageService = randomImageService;
 	}
 	
 	public RegisterMailingResponse registerMailingLink(RegisterMailingRequest request) {
@@ -105,20 +113,40 @@ public class AuthService {
 		return RegisterMailingResponse.builder().withMessage("ddd").build();
 	}
 
-	public RegisterResponse register(RegisterRequest request) {			
+	
+	public RegisterEmailResponse registerEmail(RegisterEmailRequest request) {
+		// Vérifier que les données atttendu sont présentes
+		
+		// Vérifier si selection image utilisateur correcte 
+		if(!randomImageService.isUserImageSelectionValid(null, null)) throw new RuntimeException("selection image invalide");
+		
+		// si ok: vérifier l'existrence de l'email en base de données
 		userRepository.findUserByEmail(request.getEmail()).ifPresent(user->{
 			throw new UserFindException("cet email est déja utilisé");
 		});
 		
-		request.setPassword(passwordEncoder.encode(request.getPassword()));
-		int userId = userRepository.saveUser(request);
+		// si ok; enregistrer l'email
+		UserEntity user = UserEntity.builder().withEmail(request.getEmail()).build();		
+		int userId = userRepository.saveUser(user);
 		
-		RegisterResponse response = RegisterResponse.builder()
+		// générer l'email avec le lien inscription + token de confirmation
+		
+		// envoyer un l'email
+		mailService.sendEmail(RegisterMailingRequest.builder().withRecipientMail(request.getEmail()).withSubject(EmailSubject.REGISTER).build());
+		
+		//envoyer la réponse au client
+		
+		
+		RegisterEmailResponse response = RegisterEmailResponse.builder()
 		.withMessage("votre inscription est confirmée")
 		.withUserId(userId)
 		.build();
 		
 		return response;
+	}
+	
+	public CreateAccountResponse createAccount(CreateAccountRequest request) {
+		return null;
 	}
 	
 	public LoginResponse authenticate(LoginRequest request) {		

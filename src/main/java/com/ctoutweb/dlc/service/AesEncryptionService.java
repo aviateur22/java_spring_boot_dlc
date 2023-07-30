@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.security;
+package com.ctoutweb.dlc.service;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -26,15 +26,15 @@ import com.ctoutweb.dlc.properties.AesProperties;
 
 
 @Component
-public class AesEncryption {
+public class AesEncryptionService {
 	
 	private final AesProperties aesProperties;
 	String algorithm = "AES/CBC/PKCS5Padding";
-	String salt = "fdgfggbhh";
+	String salt = "8E2EDB261622042C4BA537F970B842A22C48836BFBC9BEC8756DB400A41E41EAE2F628DE3F1F0A690AA57705CE62C5E9BCED67C8D5C22C17D735D0C137D7CC81";
 	//IvParameterSpec iv = generateIv();
 	byte[] iv = generateRandomByte();
     
-    public AesEncryption(AesProperties aesProperties) {
+    public AesEncryptionService(AesProperties aesProperties) {
 		super();
 		this.aesProperties = aesProperties;
 	}

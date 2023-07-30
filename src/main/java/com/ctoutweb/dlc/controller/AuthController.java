@@ -15,8 +15,8 @@ import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
 import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
 import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
-import com.ctoutweb.dlc.model.auth.RegisterResponse;
+import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
+import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
 import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
 
@@ -25,12 +25,12 @@ import com.ctoutweb.dlc.service.AuthService;
 public class AuthController {
 	
 	private final AuthService authService;	
-	private final AnnotationValidator<RegisterRequest> annotationValidtorRegister;
+	private final AnnotationValidator<RegisterEmailRequest> annotationValidtorRegister;
 	private final AnnotationValidator<LoginRequest> annotationValidtorLogin;
 	
 	public AuthController(
 			AuthService authService,			 
-			AnnotationValidator<RegisterRequest> annotationValidtorRegister, 
+			AnnotationValidator<RegisterEmailRequest> annotationValidtorRegister, 
 			AnnotationValidator<LoginRequest> annotationValidtorLogin		
 			) {
 		super();
@@ -52,11 +52,11 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request){
+	public ResponseEntity<RegisterEmailResponse> register(@RequestBody RegisterEmailRequest request){
 		annotationValidtorRegister.validate(request);		
 	
-		RegisterResponse response = authService.register(request);
-		return new ResponseEntity<RegisterResponse>(response, HttpStatus.CREATED);
+		RegisterEmailResponse response = authService.registerEmail(request);
+		return new ResponseEntity<RegisterEmailResponse>(response, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/logout")

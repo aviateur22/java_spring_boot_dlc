@@ -4,9 +4,15 @@ import java.util.Objects;
 
 import com.ctoutweb.dlc.service.mail.EmailSubject;
 
+
 public class RegisterMailingRequest {
 	private String recipientMail;
 	private EmailSubject subject;
+
+	private RegisterMailingRequest(Builder builder) {
+		this.recipientMail = builder.recipientMail;
+		this.subject = builder.subject;
+	}
 	/**
 	 * @return the email
 	 */
@@ -50,4 +56,31 @@ public class RegisterMailingRequest {
 		RegisterMailingRequest other = (RegisterMailingRequest) obj;
 		return Objects.equals(recipientMail, other.recipientMail) && subject == other.subject;
 	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static final class Builder {
+		private String recipientMail;
+		private EmailSubject subject;
+
+		private Builder() {
+		}
+
+		public Builder withRecipientMail(String recipientMail) {
+			this.recipientMail = recipientMail;
+			return this;
+		}
+
+		public Builder withSubject(EmailSubject subject) {
+			this.subject = subject;
+			return this;
+		}
+
+		public RegisterMailingRequest build() {
+			return new RegisterMailingRequest(this);
+		}
+	}
+	
 }

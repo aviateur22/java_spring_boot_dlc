@@ -6,151 +6,132 @@ import java.util.Objects;
 
 import java.util.Collections;
 
-public class User {
-	
+public class User {	
 	private int id;
-	private String email;	
-	private String password;
-	private Date lastLoginAt;
+	private String email;
+	private boolean isAccountCreated;
+	private Account account;
 	private List<UserRole> roles;
 	private List<Friend> friends;
 	private List<Product> products;
-	private boolean isAccountActive;
-	private Date createdAt;
-	private Date updatedAt;
+
+	private User(Builder builder) {
+		this.id = builder.id;
+		this.email = builder.email;
+		this.isAccountCreated = builder.isAccountCreated;
+		this.account = builder.account;
+		this.roles = builder.roles;
+		this.friends = builder.friends;
+		this.products = builder.products;
+	}	
 	
 	public User() {
 		
 	}
 
-	private User(Builder builder) {
-		this.id = builder.id;
-		this.email = builder.email;
-		this.password = builder.password;
-		this.lastLoginAt = builder.lastLoginAt;
-		this.roles = builder.roles;
-		this.friends = builder.friends;
-		this.products = builder.products;
-		this.isAccountActive = builder.isAccountActive;
-		this.createdAt = builder.createdAt;
-		this.updatedAt = builder.updatedAt;
-	}
 	/**
 	 * @return the id
 	 */
 	public int getId() {
 		return id;
 	}
+
 	/**
 	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	/**
 	 * @return the email
 	 */
 	public String getEmail() {
 		return email;
 	}
+
 	/**
 	 * @param email the email to set
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getPassword() {
-		return password;
-	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	/**
+	 * @return the isAccountCreated
+	 */
+	public boolean getIsAccountCreated() {
+		return isAccountCreated;
 	}
 
 	/**
-	 * @return the lastLoginAt
+	 * @param isAccountCreated the isAccountCreated to set
 	 */
-	public Date getLastLoginAt() {
-		return lastLoginAt;
+	public void setAccountCreated(boolean isAccountCreated) {
+		this.isAccountCreated = isAccountCreated;
 	}
+
 	/**
-	 * @param lastLoginAt the lastLoginAt to set
+	 * @return the account
 	 */
-	public void setLastLoginAt(Date lastLoginAt) {
-		this.lastLoginAt = lastLoginAt;
+	public Account getAccount() {
+		return account;
 	}
+
+	/**
+	 * @param account the account to set
+	 */
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+
 	/**
 	 * @return the roles
 	 */
 	public List<UserRole> getRoles() {
 		return roles;
 	}
+
 	/**
 	 * @param roles the roles to set
 	 */
 	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
 	}
+
 	/**
 	 * @return the friends
 	 */
 	public List<Friend> getFriends() {
 		return friends;
 	}
+
 	/**
 	 * @param friends the friends to set
 	 */
 	public void setFriends(List<Friend> friends) {
 		this.friends = friends;
 	}
+
 	/**
 	 * @return the products
 	 */
 	public List<Product> getProducts() {
 		return products;
 	}
+
 	/**
 	 * @param products the products to set
 	 */
 	public void setProducts(List<Product> products) {
 		this.products = products;
 	}
-	public boolean getIsAccountActive() {
-		return isAccountActive;
-	}
 
-	public void setAccountActive(boolean isAccountActive) {
-		this.isAccountActive = isAccountActive;
-	}
-
-	/**
-	 * @return the createdAt
-	 */
-	public Date getCreatedAt() {
-		return createdAt;
-	}
-	/**
-	 * @param createdAt the createdAt to set
-	 */
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-	/**
-	 * @return the updatedAt
-	 */
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-	/**
-	 * @param updatedAt the updatedAt to set
-	 */
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
-	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, email, friends, id, lastLoginAt, products, roles, updatedAt);
+		return Objects.hash(account, email, friends, id, isAccountCreated, products, roles);
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -160,16 +141,16 @@ public class User {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		return Objects.equals(createdAt, other.createdAt) && Objects.equals(email, other.email)
+		return Objects.equals(account, other.account) && Objects.equals(email, other.email)
 				&& Objects.equals(friends, other.friends) && id == other.id
-				&& Objects.equals(lastLoginAt, other.lastLoginAt) && Objects.equals(products, other.products)
-				&& Objects.equals(roles, other.roles) && Objects.equals(updatedAt, other.updatedAt);
+				&& isAccountCreated == other.isAccountCreated && Objects.equals(products, other.products)
+				&& Objects.equals(roles, other.roles);
 	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", lastLoginAt=" + lastLoginAt + ", roles=" + roles
-				+ ", friends=" + friends + ", products=" + products + ", createdAt=" + createdAt + ", updatedAt="
-				+ updatedAt + "]";
+		return "User [id=" + id + ", email=" + email + ", isAccountCreated=" + isAccountCreated + ", account=" + account
+				+ ", roles=" + roles + ", friends=" + friends + ", products=" + products + "]";
 	}
 	
 	public static Builder builder() {
@@ -179,14 +160,11 @@ public class User {
 	public static final class Builder {
 		private int id;
 		private String email;
-		private String password;
-		private Date lastLoginAt;
+		private boolean isAccountCreated;
+		private Account account;
 		private List<UserRole> roles = Collections.emptyList();
 		private List<Friend> friends = Collections.emptyList();
 		private List<Product> products = Collections.emptyList();
-		private boolean isAccountActive;
-		private Date createdAt;
-		private Date updatedAt;
 
 		private Builder() {
 		}
@@ -200,14 +178,14 @@ public class User {
 			this.email = email;
 			return this;
 		}
-		
-		public Builder withPassword(String password) {
-			this.password = password;
+
+		public Builder withIsAccountCreated(boolean isAccountCreated) {
+			this.isAccountCreated = isAccountCreated;
 			return this;
 		}
-		
-		public Builder withLastLoginAt(Date lastLoginAt) {
-			this.lastLoginAt = lastLoginAt;
+
+		public Builder withAccount(Account account) {
+			this.account = account;
 			return this;
 		}
 
@@ -225,24 +203,12 @@ public class User {
 			this.products = products;
 			return this;
 		}
-		
-		public Builder withIsAccountActive(boolean isAccountActive) {
-			this.isAccountActive = isAccountActive;
-			return this;
-		}
-
-		public Builder withCreatedAt(Date createdAt) {
-			this.createdAt = createdAt;
-			return this;
-		}
-
-		public Builder withUpdatedAt(Date updatedAt) {
-			this.updatedAt = updatedAt;
-			return this;
-		}
 
 		public User build() {
 			return new User(this);
 		}
 	}
+	
+	
+	
 }

@@ -1,11 +1,11 @@
 package com.ctoutweb.dlc.annotation.password;
 
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
+import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordMatcherValidator implements ConstraintValidator<PasswordMatcher, RegisterRequest> {
+public class PasswordMatcherValidator implements ConstraintValidator<PasswordMatcher, CreateAccountRequest> {
 
 	private String message;
 	
@@ -15,7 +15,7 @@ public class PasswordMatcherValidator implements ConstraintValidator<PasswordMat
 	}
 	
 	@Override
-	public boolean isValid(RegisterRequest request, ConstraintValidatorContext context) {
+	public boolean isValid(CreateAccountRequest request, ConstraintValidatorContext context) {
 		
 		if(request.getPassword().equals(request.getConfirmPassword())) return true;
 		

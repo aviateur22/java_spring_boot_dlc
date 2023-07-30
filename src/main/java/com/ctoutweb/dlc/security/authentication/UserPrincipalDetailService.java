@@ -33,8 +33,8 @@ public class UserPrincipalDetailService implements UserDetailsService {
 		return UserPrincipal.builder()
 				.withId(user.getId())
 				.withEmail(user.getEmail())
-				.withPassword(user.getPassword())
-				.withIsAccountActive(user.getIsAccountActive())
+				.withPassword(user.getAccount().getPassword())
+				.withIsAccountActive(user.getAccount().getIsAccountActive())
 				.withAuthorities(convertListOfRoleToSimpleGrantedAuth(user.getRoles()))
 				.build();
 	}

@@ -2,11 +2,11 @@ package com.ctoutweb.dlc.model.auth;
 
 import com.ctoutweb.dlc.model.MessageResponse;
 
-public class RegisterResponse extends MessageResponse {
+public class RegisterEmailResponse extends MessageResponse {
 
 	private int userId;
 	
-	private RegisterResponse(Builder builder) {
+	private RegisterEmailResponse(Builder builder) {
 		this.message = builder.message;
 		this.userId = builder.userId;
 	}
@@ -40,8 +40,8 @@ public class RegisterResponse extends MessageResponse {
 			return this;
 		}
 
-		public RegisterResponse build() {
-			return new RegisterResponse(this);
+		public RegisterEmailResponse build() {
+			return new RegisterEmailResponse(this);
 		}
 	}
 
