@@ -34,7 +34,7 @@ public class RandomWordService {
 		Random rand = new Random();
 		String str = rand.ints(48, 123)
 				.filter(num->(num < 58 || num > 64) && (num < 91 || num > 96))
-				.limit(5)
+				.limit(wordLength)
 				.mapToObj(c->(char) c).collect(StringBuffer::new , StringBuffer::append, StringBuffer::append)
 				.toString();
 		
@@ -46,12 +46,14 @@ public class RandomWordService {
 	public EncryptRandomWordResponse encryptRandomWord(String text) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		byte[] iv = aesEncyptionService.generateRandomByte();
 		String ivToString = Base64.getEncoder().encodeToString(iv);
-		String encryptRandomWord = aesEncyptionService.encrypt(text, iv);
-		
+		String encryptRandomWord = aesEncyptionService.encrypt(text, iv);		
 		return EncryptRandomWordResponse.builder().withEncryptRandomWord(encryptRandomWord).withIvString(ivToString).build();
 	}
 	
 	public void saveEncryptedWord(int userId, String EncryptedRandomWord, String iv, RandomCategory randomCategory) {
+		
+		randomTextUserRepository.findByUserIdAndCategoryId(userId, randomCategory.getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
+	
 		RandomTextUserEntity randomTextUserEntity = RandomTextUserEntity.builder()
 		.withCategoryId(randomCategory.getIndex())
 		.withIv(iv)

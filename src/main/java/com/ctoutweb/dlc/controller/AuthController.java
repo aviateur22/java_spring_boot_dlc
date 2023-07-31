@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ctoutweb.dlc.annotation.AnnotationValidator;
+import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
+import com.ctoutweb.dlc.model.auth.CreateAccountResponse;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
@@ -23,17 +25,17 @@ import com.ctoutweb.dlc.service.AuthService;
 public class AuthController {
 	
 	private final AuthService authService;	
-	private final AnnotationValidator<RegisterEmailRequest> annotationValidtorRegister;
+	private final AnnotationValidator<CreateAccountRequest> annotationValidtorCreateAccount;
 	private final AnnotationValidator<LoginRequest> annotationValidtorLogin;
 	
 	public AuthController(
 			AuthService authService,			 
-			AnnotationValidator<RegisterEmailRequest> annotationValidtorRegister, 
+			AnnotationValidator<CreateAccountRequest> annotationValidtorCreateAccount, 
 			AnnotationValidator<LoginRequest> annotationValidtorLogin		
 			) {
 		super();
 		this.authService = authService;		
-		this.annotationValidtorRegister = annotationValidtorRegister;
+		this.annotationValidtorCreateAccount = annotationValidtorCreateAccount;
 		this.annotationValidtorLogin = annotationValidtorLogin;
 	}
 
@@ -49,6 +51,14 @@ public class AuthController {
 	
 		RegisterEmailResponse response = authService.registerEmail(request);
 		return new ResponseEntity<RegisterEmailResponse>(response, HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/create-account")
+	public ResponseEntity<CreateAccountResponse> createAccount(@RequestBody CreateAccountRequest request){
+		annotationValidtorCreateAccount.validate(request);
+		
+		CreateAccountResponse response = authService.createAccount(request);
+		return new ResponseEntity<CreateAccountResponse>(response, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/logout")

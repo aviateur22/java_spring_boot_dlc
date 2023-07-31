@@ -27,13 +27,15 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 	private final ProductRepository productRepository;
 	private final FriendsRepository friendRepository;
 	private final AccountRepository accountRepository;
+	private final RandomTextUserRepository randomTextUserRepository;
 
 	public UserRepositoryImp(JdbcTemplate jdbcTemplate, 
 			RoleUserRepository roleUserRepository, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate, 
 			ProductRepository productRepository, 
 			FriendsRepository friendRepository, 
-			AccountRepository accountRepository) {
+			AccountRepository accountRepository, 
+			RandomTextUserRepository randomTextUserRepository) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -41,6 +43,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		this.productRepository = productRepository;
 		this.friendRepository = friendRepository;
 		this.accountRepository = accountRepository;
+		this.randomTextUserRepository = randomTextUserRepository;
 	}
 
 	@Override
@@ -79,6 +82,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
 			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
 			findUser.setProducts(productRepository.findProductsByUserId(userId));
+			findUser.setRandomTexts(randomTextUserRepository.findByUserI(userId));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -101,6 +105,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					email);			
 			findUser.setAccount(accountRepository.findAccountById(findUser.getId()).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(findUser.getId()));
+			findUser.setRandomTexts(randomTextUserRepository.findByUserI(findUser.getId()));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -131,5 +136,13 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		
 		
 		return findUsers;
+	}
+	
+	public int deleteByEmail(String email) {
+		String query = "DELETE FROM users WHERE email = ?";
+		int deleteRow = jdbcTemplate.update(query, email);
+		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
+		return deleteRow;
 	}
 }

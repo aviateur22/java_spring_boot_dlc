@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.entity.UserEntity;
+import com.ctoutweb.dlc.exception.custom.EmailException;
+import com.ctoutweb.dlc.exception.custom.EncryptionException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
@@ -150,32 +152,54 @@ public class AuthService {
 			randomWordService.saveEncryptedWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTER);
 			randomWordService.saveEncryptedWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.EMAILCONFIRMATION);
 			
-			Map <String, String> replaceWords = new HashMap<>();			
-			replaceWords.put("token", randomString);
-			replaceWords.put("email", request.getEmail());
-			replaceWords.put("link", "auth/create-account/user/"+ request.getEmail() + "/confirmation/" + emailConfirmationString.getEncryptRandomWord());
+			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
+			listWordsToReplaceInHtmlTemplate.put("token", randomString);
+			listWordsToReplaceInHtmlTemplate.put("email", request.getEmail());
+			listWordsToReplaceInHtmlTemplate.put("link", "auth/create-account/user/"+ request.getEmail() + "/confirmation/" + emailConfirmationString.getEncryptRandomWord());
 			
 			// envoyer un l'email
 			mailService.sendEmail(RegisterMailingRequest.builder()
-					.withWordsToReplaceInHtmlTemplate(replaceWords)
+					.withWordsToReplaceInHtmlTemplate(listWordsToReplaceInHtmlTemplate)
 					.withEmail(request.getEmail())
 					.withEmailSubject(EmailSubject.REGISTER).build());
 			
 			//envoyer la réponse au client			
 			RegisterEmailResponse response = RegisterEmailResponse.builder()
-					.withMessage("votre inscription est confirmée")
+					.withMessage("vous allez recevoir un email pour terminer votre inscription")
 					.withUserId(userId)
 					.build();
 			
+			//throw 
+			
 			return response;
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
-			return null;
-		} 
-		
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | 				InvalidKeySpecException e) {
+			userRepository.deleteByEmail(request.getEmail());
+			throw new EncryptionException();
+		}	catch(EmailException e) {
+			userRepository.deleteByEmail(request.getEmail());
+			throw new EmailException("erreur lors de l'envoie de l'email d'inscription");
+		}
 	}
 	
 	public CreateAccountResponse createAccount(CreateAccountRequest request) {
-		return null;
+		// vérifier les données envoyées
+		
+		// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
+		User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
+		System.out.println("user.getRandomTexts()");
+		user.getRandomTexts().forEach(e->System.out.println(e.getExpiredAt()));
+		
+		// Vérifier validité token + token registerurl
+		
+		// vérifier expired_at
+		
+		// créer le compte
+		
+		// supprimer les données dans random table
+		
+		// renvoyer la réponse
+		CreateAccountResponse response = CreateAccountResponse.builder().withMessage("").build();
+		return response;
 	}
 	
 	public LoginResponse authenticate(LoginRequest request) {		
