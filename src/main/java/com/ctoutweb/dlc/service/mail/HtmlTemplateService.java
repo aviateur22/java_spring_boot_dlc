@@ -8,8 +8,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.crypto.BadPaddingException;
@@ -21,22 +19,9 @@ import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.model.EmailTemplateInformation;
 import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
-import com.ctoutweb.dlc.repository.RandomTextUserRepository;
-import com.ctoutweb.dlc.service.random.RandomWordService;
 
 @Service
-public class HtmlTemplateService {
-	
-	private final RandomWordService randomWordService;
-	private final RandomTextUserRepository randomTextUserRepository;
-	
-	
-	
-	public HtmlTemplateService(RandomWordService randomWordService, RandomTextUserRepository randomTextUserRepository) {
-		super();
-		this.randomWordService = randomWordService;
-		this.randomTextUserRepository = randomTextUserRepository;
-	}
+public class HtmlTemplateService {	
 
 	public EmailTemplateInformation getTemplateFromFile(RegisterMailingRequest registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {	
 		
@@ -49,19 +34,10 @@ public class HtmlTemplateService {
 	
 	private EmailTemplateInformation getTemplateInformation(RegisterMailingRequest registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		
-		switch (registerMailing.getSubject()) {
+		switch (registerMailing.getEmailSubject()) {
 		case REGISTER:
 			
-			HashMap<String, String> replaceWords = new HashMap<String, String>();
-			
-			String randomString = randomWordService.generateRandom(5);
-			String encryptedRandomString = randomWordService.encryptRandomWord(randomString);
-			
-			// generation token 5 lettres en claire et chiffré
-			replaceWords.put("token", randomString);
-			replaceWords.put("email", registerMailing.getRecipientMail());
-			
-			String htmlTemplate = getHtmlTemplate("templates/html/registerLink.html", replaceWords) ;
+			String htmlTemplate = getHtmlTemplate("templates/html/registerLink.html", registerMailing.getWordsToReplaceInHtmlTemplate()) ;
 			
 			return EmailTemplateInformation.builder()
 					.withSubject("inscription à dlc")
@@ -89,15 +65,14 @@ public class HtmlTemplateService {
 		return resultStringBuilder.toString();
 	}
 	
-	private String getHtmlTemplate(String filePath, HashMap<String, String> replaceWords) throws IOException {
-		InputStream fileStream = new ClassPathResource("templates/html/registerLink.html").getInputStream();		
+	private String getHtmlTemplate(String filePath, Map<String, String> replaceWords) throws IOException {
+		InputStream fileStream = new ClassPathResource(filePath).getInputStream();		
 		String content = this.readFromInputStream(fileStream);
 		
-		Iterator<Map.Entry<String, String>> iterator = replaceWords.entrySet().iterator();
-		
-		replaceWords.forEach((key, value) -> {
-			 content.replace("!%!"+ key +"!%!", value);
-		    });
+		for(Map.Entry<String, String> k: replaceWords.entrySet()) {
+			System.out.println(k.getKey());
+			content =   content.replace("!%!"+ k.getKey() +"!%!", k.getValue());
+		}
 		
 		return content;
 	}

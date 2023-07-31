@@ -11,6 +11,17 @@ public class RandomTextUserEntity {
 	private int categoryId;
 	private Date createdAt;
 	private Date updatedAt;
+
+	private RandomTextUserEntity(Builder builder) {
+		this.id = builder.id;
+		this.randomText = builder.randomText;
+		this.iv = builder.iv;
+		this.expiredAt = builder.expiredAt;
+		this.userId = builder.userId;
+		this.categoryId = builder.categoryId;
+		this.createdAt = builder.createdAt;
+		this.updatedAt = builder.updatedAt;
+	}
 	/**
 	 * @return the id
 	 */
@@ -107,6 +118,69 @@ public class RandomTextUserEntity {
 	public void setUpdatedAt(Date updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+	
+	public static Builder builder() {
+		return new Builder();
+	}
+	
+	public static final class Builder {
+		private int id;
+		private String randomText;
+		private String iv;
+		private Date expiredAt;
+		private int userId;
+		private int categoryId;
+		private Date createdAt;
+		private Date updatedAt;
+
+		private Builder() {
+		}
+
+		public Builder withId(int id) {
+			this.id = id;
+			return this;
+		}
+
+		public Builder withRandomText(String randomText) {
+			this.randomText = randomText;
+			return this;
+		}
+
+		public Builder withIv(String iv) {
+			this.iv = iv;
+			return this;
+		}
+
+		public Builder withExpiredAt(Date expiredAt) {
+			this.expiredAt = expiredAt;
+			return this;
+		}
+
+		public Builder withUserId(int userId) {
+			this.userId = userId;
+			return this;
+		}
+
+		public Builder withCategoryId(int categoryId) {
+			this.categoryId = categoryId;
+			return this;
+		}
+
+		public Builder withCreatedAt(Date createdAt) {
+			this.createdAt = createdAt;
+			return this;
+		}
+
+		public Builder withUpdatedAt(Date updatedAt) {
+			this.updatedAt = updatedAt;
+			return this;
+		}
+
+		public RandomTextUserEntity build() {
+			return new RandomTextUserEntity(this);
+		}
+	}
+	
 	
 	
 }

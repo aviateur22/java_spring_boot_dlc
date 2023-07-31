@@ -96,7 +96,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)-> User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withIsAccountCreated(rs.getBoolean("isAccountCreated"))					
+					.withIsAccountCreated(rs.getBoolean("is_account_created"))					
 					.build(),
 					email);			
 			findUser.setAccount(accountRepository.findAccountById(findUser.getId()).orElse(null));
@@ -115,7 +115,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 				(rs, rowNum)->User.builder()
 				.withId(rs.getInt("id"))
 				.withEmail(rs.getString("email"))
-				.withIsAccountCreated(rs.getBoolean("isAccountCreated"))
+				.withIsAccountCreated(rs.getBoolean("is_account_created"))
 				.build())
 		.stream()
 		.map(user->User.builder()

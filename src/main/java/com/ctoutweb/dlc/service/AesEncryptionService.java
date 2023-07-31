@@ -47,7 +47,7 @@ public class AesEncryptionService {
 	    return secret;
 	}
 	
-	private byte[] generateRandomByte() {
+	public byte[] generateRandomByte() {
 	    byte[] iv = new byte[16];
 	    new SecureRandom().nextBytes(iv);
 	    return iv;
@@ -57,10 +57,9 @@ public class AesEncryptionService {
 	    return new IvParameterSpec(bytes);
 	}
 	
-	public String encrypt(String text) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+	public String encrypt(String text, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		Cipher cipher = Cipher.getInstance(this.algorithm);
 		SecretKey key = this.generateSecretKey();
-		System.out.println(iv);
 		cipher.init(Cipher.ENCRYPT_MODE,key, this.generateParameterSpecIv(iv));
 		byte[] cipherText = cipher.doFinal(text.getBytes());	
 	    return Base64.getEncoder()

@@ -1,49 +1,61 @@
 package com.ctoutweb.dlc.model.auth;
 
+import java.util.Map;
 import java.util.Objects;
 
 import com.ctoutweb.dlc.service.mail.EmailSubject;
 
+import java.util.Collections;
 
 public class RegisterMailingRequest {
-	private String recipientMail;
-	private EmailSubject subject;
+	private EmailSubject emailSubject;
+	private String email;
+	private Map<String, String> wordsToReplaceInHtmlTemplate;
 
 	private RegisterMailingRequest(Builder builder) {
-		this.recipientMail = builder.recipientMail;
-		this.subject = builder.subject;
+		this.emailSubject = builder.emailSubject;
+		this.email = builder.email;
+		this.wordsToReplaceInHtmlTemplate = builder.wordsToReplaceInHtmlTemplate;
+	}
+	/**
+	 * @return the emailSubject
+	 */
+	public EmailSubject getEmailSubject() {
+		return emailSubject;
+	}
+	/**
+	 * @param emailSubject the emailSubject to set
+	 */
+	public void setEmailSubject(EmailSubject emailSubject) {
+		this.emailSubject = emailSubject;
 	}
 	/**
 	 * @return the email
 	 */
-	public String getRecipientMail() {
-		return recipientMail;
+	public String getEmail() {
+		return email;
 	}
 	/**
 	 * @param email the email to set
 	 */
-	public void setRecipientMail(String recipientMail) {
-		this.recipientMail = recipientMail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	/**
-	 * @return the subject
+	 * @return the wordsToReplaceInHtmlTemplate
 	 */
-	public EmailSubject getSubject() {
-		return subject;
+	public Map<String, String> getWordsToReplaceInHtmlTemplate() {
+		return wordsToReplaceInHtmlTemplate;
 	}
 	/**
-	 * @param subject the subject to set
+	 * @param wordsToReplaceInHtmlTemplate the wordsToReplaceInHtmlTemplate to set
 	 */
-	public void setSubject(int subjectValue) {
-		this.subject = EmailSubject.getSubjectFromValue(subjectValue).orElseThrow();
-	}
-	@Override
-	public String toString() {
-		return "EmailRegisterRequest [email=" + recipientMail + ", subject=" + subject + "]";
+	public void setWordsToReplaceInHtmlTemplate(Map<String, String> wordsToReplaceInHtmlTemplate) {
+		this.wordsToReplaceInHtmlTemplate = wordsToReplaceInHtmlTemplate;
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(recipientMail, subject);
+		return Objects.hash(email, emailSubject, wordsToReplaceInHtmlTemplate);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -54,27 +66,39 @@ public class RegisterMailingRequest {
 		if (getClass() != obj.getClass())
 			return false;
 		RegisterMailingRequest other = (RegisterMailingRequest) obj;
-		return Objects.equals(recipientMail, other.recipientMail) && subject == other.subject;
+		return Objects.equals(email, other.email) && emailSubject == other.emailSubject
+				&& Objects.equals(wordsToReplaceInHtmlTemplate, other.wordsToReplaceInHtmlTemplate);
 	}
-
+	@Override
+	public String toString() {
+		return "RegisterMailingRequest [emailSubject=" + emailSubject + ", email=" + email
+				+ ", wordsToReplaceInHtmlTemplate=" + wordsToReplaceInHtmlTemplate + "]";
+	}
+	
 	public static Builder builder() {
 		return new Builder();
 	}
-
+	
 	public static final class Builder {
-		private String recipientMail;
-		private EmailSubject subject;
+		private EmailSubject emailSubject;
+		private String email;
+		private Map<String, String> wordsToReplaceInHtmlTemplate = Collections.emptyMap();
 
 		private Builder() {
 		}
 
-		public Builder withRecipientMail(String recipientMail) {
-			this.recipientMail = recipientMail;
+		public Builder withEmailSubject(EmailSubject emailSubject) {
+			this.emailSubject = emailSubject;
 			return this;
 		}
 
-		public Builder withSubject(EmailSubject subject) {
-			this.subject = subject;
+		public Builder withEmail(String email) {
+			this.email = email;
+			return this;
+		}
+
+		public Builder withWordsToReplaceInHtmlTemplate(Map<String, String> wordsToReplaceInHtmlTemplate) {
+			this.wordsToReplaceInHtmlTemplate = wordsToReplaceInHtmlTemplate;
 			return this;
 		}
 

@@ -27,11 +27,11 @@ public class MailServiceImp implements MailService {
 	public void sendEmail(RegisterMailingRequest registerMailing)  {
 		try {
 			
-			EmailTemplateInformation emailInformation = htmlTemplateService.getTemplateFromFile(registerMailing);
+			EmailTemplateInformation emailInformation = htmlTemplateService.getTemplateFromFile(registerMailing);			
 			MimeMessage message = mailSender.createMimeMessage();			
 			MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");		    
 			helper.setText(emailInformation.getTemplateContent(), true);
-			helper.setTo(registerMailing.getRecipientMail());
+			helper.setTo(registerMailing.getEmail());
 			helper.setSubject(emailInformation.getSubject());
 			helper.setFrom("admin@ctoutweb.fr");
 			mailSender.send(message);
