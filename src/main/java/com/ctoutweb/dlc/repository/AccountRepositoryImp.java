@@ -61,4 +61,13 @@ public class AccountRepositoryImp extends IdKeyHolder implements AccountReposito
 		}
 	}
 
+	@Override
+	public int deleteAccountByUserId(int userId) {
+		String query = "DELETE FROM accounts WHERE user_id = ?";
+		int deleteRow = jdbcTemplate.update(query, userId);
+		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression compte utilisateur");		
+		return deleteRow;
+	}
+
 }

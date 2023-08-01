@@ -147,4 +147,15 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
 		return deleteRow;
 	}
+
+	@Override
+	public int updateUserByUserId(UserEntity user) {
+		String query = "UPDATE users SET is_account_created=:isAccountCreated, updated_at=:updatedAt WHERE id = :id";
+		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(user);
+		int updatedRow = namedParameterJdbcTemplate.update(query, sqlParam);
+		
+		if(updatedRow == 0) throw new InsertSQLException("probleme update user");
+		
+		return updatedRow;
+	}
 }

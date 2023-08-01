@@ -62,7 +62,18 @@ public class RandomWordService {
 		.build();
 		
 		randomTextUserRepository.save(randomTextUserEntity);
-	}	
+	}
+	
+	public boolean isDecryptedRandomWordValid(String decryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase);		
+		System.out.println("debut");
+		System.out.println(decryptedRandomWordFromClient);
+		System.out.println(encryptedRandomWordFromDatabase);
+		System.out.println(decryptRandomWordFromDatabase);
+		System.out.println(decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase));
+		System.out.println("Fin");
+		return decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase);
+	}
 	
 	public boolean isEncryptedRandomWordValid(String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		String decryptRandomWordFromClient = decryptRandomWord(encryptedRandomWordFromClient, ivFromDatabase);

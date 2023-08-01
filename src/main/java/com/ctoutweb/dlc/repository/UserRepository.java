@@ -12,4 +12,5 @@ public interface UserRepository {
 	Optional<User> findUserByEmail(String email);
 	List<User>findAllUsers();
 	int deleteByEmail(String email);
+	int updateUserByUserId(UserEntity user);
 }

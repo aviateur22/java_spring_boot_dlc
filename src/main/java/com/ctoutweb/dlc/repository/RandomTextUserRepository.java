@@ -9,6 +9,7 @@ import com.ctoutweb.dlc.model.RandomTextUser;
 public interface RandomTextUserRepository {
 	int save(RandomTextUserEntity randomTextUser);
 	int delete(int id);
+	int deleteByUserId(int userId);
 	Optional<RandomTextUserEntity> findByUserIdAndCategoryId(int userId, int categoryId);
 	List<RandomTextUser> findByUserI(int userId);
 }

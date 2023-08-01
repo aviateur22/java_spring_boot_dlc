@@ -12,6 +12,10 @@ public class Account {
 	private Date maximumAccountActivationDate;
 	private Date createdAt;
 	private Date updatedAt;
+	
+	public Account() {
+		
+	}
 
 	private Account(Builder builder) {
 		this.id = builder.id;

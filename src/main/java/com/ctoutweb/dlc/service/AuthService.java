@@ -4,6 +4,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ctoutweb.dlc.entity.AccountEntity;
 import com.ctoutweb.dlc.entity.UserEntity;
+import com.ctoutweb.dlc.exception.custom.CreateAccountException;
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.EncryptionException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
+import com.ctoutweb.dlc.model.Account;
 import com.ctoutweb.dlc.model.RandomTextUser;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
@@ -36,6 +40,7 @@ import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
 import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
 import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
+import com.ctoutweb.dlc.repository.AccountRepository;
 import com.ctoutweb.dlc.repository.RandomTextUserRepository;
 import com.ctoutweb.dlc.repository.UserRepository;
 import com.ctoutweb.dlc.security.authentication.UserPrincipal;
@@ -59,6 +64,7 @@ public class AuthService {
 	private final RandomImageService randomImageService;
 	private final RandomWordService randomWordService;
 	private final RandomTextUserRepository randomTextUserRepository;
+	private final AccountRepository accountRepository;
 	
 
 	public AuthService(
@@ -71,7 +77,8 @@ public class AuthService {
 			AesEncryptionService aesEncryption, 
 			RandomImageService randomImageService, 
 			RandomWordService randomWordService, 
-			RandomTextUserRepository randomTextUserRepository) {
+			RandomTextUserRepository randomTextUserRepository, 
+			AccountRepository accountRepository) {
 		super();
 		this.mailService = mailService;
 		this.passwordEncoder = passwordEncoder;		
@@ -83,6 +90,7 @@ public class AuthService {
 		this.randomImageService = randomImageService;
 		this.randomWordService = randomWordService;
 		this.randomTextUserRepository = randomTextUserRepository;
+		this.accountRepository = accountRepository;
 	}
 	
 	public RegisterEmailResponse registerEmail(RegisterEmailRequest request) {
@@ -129,8 +137,6 @@ public class AuthService {
 					.withUserId(userId)
 					.build();
 			
-			//throw 
-			
 			return response;
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | 				InvalidKeySpecException e) {
 			userRepository.deleteByEmail(request.getEmail());
@@ -146,25 +152,41 @@ public class AuthService {
 			// vérifier les données envoyées
 			
 			// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
-			User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
+			User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new CreateAccountException("impossible de vérifier le code de confirmation"));
 			
 			// Récupération des randomTexts
 			List<RandomTextUser> randomTextUser = user.getRandomTexts();
 			
 			// Vérifier validité code de confirmation client et code confirmation chiffré en base de données
 			RandomTextUser emailToken = randomTextUser.stream()
-					.filter(random->random.getCategoryId() == RandomCategory.EMAILCONFIRMATION.getIndex())
+					.filter(random->random.getCategoryId() == RandomCategory.REGISTER.getIndex())
 					.findFirst()
-					.get();
-			
-			System.out.println(emailToken.getRandomText());
-			randomWordService.isEncryptedRandomWordValid("", "",emailToken.getIv());
+					.orElseThrow(()-> new CreateAccountException("impossible de vérifier le code de confirmation"));			
 			
 			// vérifier expired_at
+			if(emailToken.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException("le delais de création d'un compte est expiré. Merci de vous réinscrire");
 			
+			//Vérification code de confirmation avec le code présent en base de donnée
+			if(!randomWordService.isDecryptedRandomWordValid(request.getToken(), emailToken.getRandomText(),emailToken.getIv())) throw new CreateAccountException("le code de confirmation n'est pas correcte");
+						
 			// créer le compte
+			accountRepository.findAccountByUserId(user.getId()).ifPresent(account->accountRepository.deleteAccountByUserId(user.getId()));
+			accountRepository.saveAccount(AccountEntity.builder()
+					.withPassword(passwordEncoder.encode(request.getPassword()))
+					.withUserId(user.getId())
+					.build());
+			
+			// Mise a jour de user
+			UserEntity userEntity = UserEntity.builder()
+					.withId(user.getId())
+					.withUpdatedAt(new Date())
+					.withIsAccountCreated(true)
+					.build();
+			
+			userRepository.updateUserByUserId(userEntity);
 			
 			// supprimer les données dans random table
+			randomTextUserRepository.deleteByUserId(user.getId());
 			
 			// renvoyer la réponse
 			CreateAccountResponse response = CreateAccountResponse.builder().withMessage(emailToken.getRandomText()).build();
@@ -173,6 +195,8 @@ public class AuthService {
 			//userRepository.deleteByEmail(request.getEmail());
 			e.printStackTrace();
 			throw new EncryptionException(e.getMessage());
+		} catch(RuntimeException ex) {
+			throw new CreateAccountException(ex.getMessage());
 		}
 	}
 	

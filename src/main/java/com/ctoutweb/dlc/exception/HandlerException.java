@@ -17,6 +17,7 @@ import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ctoutweb.dlc.exception.custom.AnnotationException;
+import com.ctoutweb.dlc.exception.custom.CreateAccountException;
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.EncryptionException;
 import com.ctoutweb.dlc.exception.custom.FileException;
@@ -112,18 +113,26 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
 	}
 	
+	@ExceptionHandler(value = {AuthenticationException.class})
+	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
+		System.out.println("kfmfkgfmmùfkgfgkfgfkgfs");
+		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
+		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
+		ex.printStackTrace();
+		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	}
+	
 	@ExceptionHandler(value = {EncryptionException.class})
 	public ResponseEntity<ErrorResponse>EncryptionException(EncryptionException ex, WebRequest request){	
 		ErrorResponse error = new ErrorResponse("erreur chiffrement");
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(value = {AuthenticationException.class})
-	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
-		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
-		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
-		ex.printStackTrace();
-		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
+	@ExceptionHandler(value = {CreateAccountException.class})
+	public ResponseEntity<ErrorResponse> createAccountException(CreateAccountException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
+	
 	
 }

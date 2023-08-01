@@ -83,4 +83,13 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 		return findUserRandomText;
 	}
 
+	@Override
+	public int deleteByUserId(int userId) {
+		String query = "DELETE FROM random_text_user WHERE user_id = ?";
+		int deleteRow = jdbcTemplate.update(query, userId);
+		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
+		return deleteRow;
+	}
+
 }
