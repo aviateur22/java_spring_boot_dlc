@@ -43,10 +43,10 @@ public class RandomWordService {
 	
 
 	
-	public EncryptRandomWordResponse encryptRandomWord(String text) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+	public EncryptRandomWordResponse encryptRandomWord(String text, boolean isUrlBase64) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		byte[] iv = aesEncyptionService.generateRandomByte();
 		String ivToString = Base64.getEncoder().encodeToString(iv);
-		String encryptRandomWord = aesEncyptionService.encrypt(text, iv);		
+		String encryptRandomWord = aesEncyptionService.encrypt(text, iv, isUrlBase64);		
 		return EncryptRandomWordResponse.builder().withEncryptRandomWord(encryptRandomWord).withIvString(ivToString).build();
 	}
 	
@@ -64,8 +64,8 @@ public class RandomWordService {
 		randomTextUserRepository.save(randomTextUserEntity);
 	}
 	
-	public boolean isDecryptedRandomWordValid(String decryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
-		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase);		
+	public boolean isDecryptedRandomWordValid(String decryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase, isUrlBase64);		
 		System.out.println("debut");
 		System.out.println(decryptedRandomWordFromClient);
 		System.out.println(encryptedRandomWordFromDatabase);
@@ -75,16 +75,16 @@ public class RandomWordService {
 		return decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase);
 	}
 	
-	public boolean isEncryptedRandomWordValid(String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-		String decryptRandomWordFromClient = decryptRandomWord(encryptedRandomWordFromClient, ivFromDatabase);
-		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase);
+	public boolean isEncryptedRandomWordValid(String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+		String decryptRandomWordFromClient = decryptRandomWord(encryptedRandomWordFromClient, ivFromDatabase, isUrlBase64);
+		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase, isUrlBase64);
 		
 		return decryptRandomWordFromClient.equals(decryptRandomWordFromDatabase);
 	}
 	
-	private String decryptRandomWord(String encryptedRandomWord, String ivString) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	private String decryptRandomWord(String encryptedRandomWord, String ivString, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		byte[] iv = Base64.getDecoder().decode(ivString.getBytes());
-		String decryptRandomString = aesEncyptionService.decrypt(encryptedRandomWord, iv);
+		String decryptRandomString = aesEncyptionService.decrypt(encryptedRandomWord, iv, isUrlBase64);
 		return decryptRandomString;
 	}
 	

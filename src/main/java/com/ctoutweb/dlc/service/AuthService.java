@@ -111,14 +111,14 @@ public class AuthService {
 			
 			// générer code de confirmation de 5 lettres en claire et chiffré
 			String randomString = randomWordService.generateRandom(5);		
-			EncryptRandomWordResponse encryptedRandomString = randomWordService.encryptRandomWord(randomString);
+			EncryptRandomWordResponse encryptedRandomString = randomWordService.encryptRandomWord(randomString, false);
 			
 			// générer un code de 45 lettres chiffrés
-			EncryptRandomWordResponse emailConfirmationString = randomWordService.encryptRandomWord(randomWordService.generateRandom(45));
+			EncryptRandomWordResponse emailConfirmationString = randomWordService.encryptRandomWord(randomWordService.generateRandom(45), true);
 			
 			// save mot chiffré et info du mail en bdd
-			randomWordService.saveEncryptedRandomWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTER);
-			randomWordService.saveEncryptedRandomWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.EMAILCONFIRMATION);
+			randomWordService.saveEncryptedRandomWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTEREMAILTOKEN);
+			randomWordService.saveEncryptedRandomWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.URLTOKEN);
 			
 			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
 			listWordsToReplaceInHtmlTemplate.put("token", randomString);
@@ -149,25 +149,22 @@ public class AuthService {
 	
 	public CreateAccountResponse createAccount(CreateAccountRequest request) {
 		try {
-			// vérifier les données envoyées
+			
 			
 			// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
 			User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new CreateAccountException("impossible de vérifier le code de confirmation"));
 			
+			// Vérification si compte déja créé
+			if(user.getIsAccountCreated()) throw new CreateAccountException("votre compte est déja créé");
+				
 			// Récupération des randomTexts
 			List<RandomTextUser> randomTextUser = user.getRandomTexts();
 			
-			// Vérifier validité code de confirmation client et code confirmation chiffré en base de données
-			RandomTextUser emailToken = randomTextUser.stream()
-					.filter(random->random.getCategoryId() == RandomCategory.REGISTER.getIndex())
-					.findFirst()
-					.orElseThrow(()-> new CreateAccountException("impossible de vérifier le code de confirmation"));			
+			// vérifier le 'encryptedRandomURLToken	
+			this.createAccountHelper(randomTextUser, RandomCategory.URLTOKEN, true, request.getUrlToken(), true);
 			
-			// vérifier expired_at
-			if(emailToken.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException("le delais de création d'un compte est expiré. Merci de vous réinscrire");
-			
-			//Vérification code de confirmation avec le code présent en base de donnée
-			if(!randomWordService.isDecryptedRandomWordValid(request.getToken(), emailToken.getRandomText(),emailToken.getIv())) throw new CreateAccountException("le code de confirmation n'est pas correcte");
+			// Vérifier Token de 5 characteres
+			this.createAccountHelper(randomTextUser, RandomCategory.REGISTEREMAILTOKEN, false, request.getToken(), false);			
 						
 			// créer le compte
 			accountRepository.findAccountByUserId(user.getId()).ifPresent(account->accountRepository.deleteAccountByUserId(user.getId()));
@@ -189,7 +186,7 @@ public class AuthService {
 			randomTextUserRepository.deleteByUserId(user.getId());
 			
 			// renvoyer la réponse
-			CreateAccountResponse response = CreateAccountResponse.builder().withMessage(emailToken.getRandomText()).build();
+			CreateAccountResponse response = CreateAccountResponse.builder().withMessage("votre compte est créé").build();
 			return response;
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | 				InvalidKeySpecException e) {
 			//userRepository.deleteByEmail(request.getEmail());
@@ -217,6 +214,22 @@ public class AuthService {
 		return LogoutResponse.builder().withMessage("à bientôt").build();
 	}
 	
-	
+	private void createAccountHelper(List<RandomTextUser> randomTextUser, RandomCategory randomCategory, boolean isRandomWordEncrypted, String clientToken, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+		// vérifier le 'encryptedRandomURLToken			
+		RandomTextUser token = randomTextUser.stream()
+				.filter(random->random.getCategoryId() == randomCategory.getIndex())
+				.findFirst()
+				.orElseThrow(()-> new CreateAccountException("impossible de vérifier le code de confirmation"));
+		
+		// Vérifier expiredAt
+		if(token.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException("le delais de création d'un compte est expiré. Merci de vous réinscrire");
+		
+		//Vérification urlToken  avec le code présent en base de donnée
+		if(isRandomWordEncrypted) {
+			if(!randomWordService.isEncryptedRandomWordValid(clientToken, token.getRandomText(), token.getIv(), isUrlBase64)) throw new CreateAccountException("le code de confirmation n'est pas correcte");			
+		} else {
+			if(!randomWordService.isDecryptedRandomWordValid(clientToken, token.getRandomText(), token.getIv(), isUrlBase64)) throw new CreateAccountException("le code de confirmation n'est pas correcte");
+		}
+	}
 	
 }

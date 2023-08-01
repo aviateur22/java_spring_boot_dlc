@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum RandomCategory {
-	REGISTER(1),
-	RESETPASSWORD(2),
-	EMAILCONFIRMATION(3);
+	REGISTEREMAILTOKEN(1),
+	RESETPASSWORDTOKEN(2),
+	URLTOKEN(3);
 	
 	private int index;
 	

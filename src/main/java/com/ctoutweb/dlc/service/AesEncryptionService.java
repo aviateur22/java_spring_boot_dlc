@@ -57,14 +57,17 @@ public class AesEncryptionService {
 	    return new IvParameterSpec(bytes);
 	}
 	
-	public String encrypt(String text, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+	public String encrypt(String text, byte[] iv, boolean isUrlBase64) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		Cipher cipher = Cipher.getInstance(this.algorithm);
 		SecretKey key = this.generateSecretKey();
 		cipher.init(Cipher.ENCRYPT_MODE,key, this.generateParameterSpecIv(iv));
-		byte[] cipherText = cipher.doFinal(text.getBytes());	
-	    return Base64.getEncoder()
-	        .encodeToString(cipherText);
+				
+		byte[] cipherText = cipher.doFinal(text.getBytes());
 		
+		if(isUrlBase64) return Base64.getUrlEncoder().encodeToString(cipherText);
+		
+	    return Base64.getEncoder()
+	        .encodeToString(cipherText);		
 	}
 	
 
@@ -82,14 +85,19 @@ public class AesEncryptionService {
 		
 	}
 	
-	public String decrypt(String cipherText, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
+	public String decrypt(String cipherText, byte[] iv, boolean isUrlBase64) throws NoSuchPaddingException, NoSuchAlgorithmException,
 		    InvalidAlgorithmParameterException, InvalidKeyException,
 		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
 			SecretKey key = this.generateSecretKey();			
 		    Cipher cipher = Cipher.getInstance(algorithm);
 		    cipher.init(Cipher.DECRYPT_MODE, key, this.generateParameterSpecIv(iv));
-		    byte[] plainText = cipher.doFinal(Base64.getDecoder()
-		        .decode(cipherText));
+		    
+		    if(isUrlBase64) {
+		    	 byte[] plainText = cipher.doFinal(Base64.getUrlDecoder().decode(cipherText));
+		    	 return new String(plainText);
+		    }		    
+		    
+		    byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(cipherText));
 		    return new String(plainText);
 	}
 }
