@@ -82,12 +82,10 @@ public class AesEncryptionService {
 		
 	}
 	
-	public String decrypt(String cipherText) throws NoSuchPaddingException, NoSuchAlgorithmException,
+	public String decrypt(String cipherText, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
 		    InvalidAlgorithmParameterException, InvalidKeyException,
-		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-		
-			SecretKey key = this.generateSecretKey();
-			System.out.println("byte array = " + iv);
+		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+			SecretKey key = this.generateSecretKey();			
 		    Cipher cipher = Cipher.getInstance(algorithm);
 		    cipher.init(Cipher.DECRYPT_MODE, key, this.generateParameterSpecIv(iv));
 		    byte[] plainText = cipher.doFinal(Base64.getDecoder()

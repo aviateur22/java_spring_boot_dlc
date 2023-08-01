@@ -1,8 +1,8 @@
 package com.ctoutweb.dlc.model;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Date;
 
 import java.util.Collections;
 
@@ -10,16 +10,18 @@ public class User {
 	private int id;
 	private String email;
 	private boolean isAccountCreated;
+	private Date maximumAccountCreationDate;
 	private Account account;
 	private List<UserRole> roles;
 	private List<Friend> friends;
 	private List<Product> products;
 	private List<RandomTextUser> RandomTexts;
-
+	
 	private User(Builder builder) {
 		this.id = builder.id;
 		this.email = builder.email;
 		this.isAccountCreated = builder.isAccountCreated;
+		this.maximumAccountCreationDate = builder.maximumAccountCreationDate;
 		this.account = builder.account;
 		this.roles = builder.roles;
 		this.friends = builder.friends;
@@ -61,6 +63,18 @@ public class User {
 	 */
 	public void setAccountCreated(boolean isAccountCreated) {
 		this.isAccountCreated = isAccountCreated;
+	}
+	/**
+	 * @return the maximumAccountCreationDate
+	 */
+	public Date getMaximumAccountCreationDate() {
+		return maximumAccountCreationDate;
+	}
+	/**
+	 * @param maximumAccountCreationDate the maximumAccountCreationDate to set
+	 */
+	public void setMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+		this.maximumAccountCreationDate = maximumAccountCreationDate;
 	}
 	/**
 	 * @return the account
@@ -122,6 +136,32 @@ public class User {
 	public void setRandomTexts(List<RandomTextUser> randomTexts) {
 		RandomTexts = randomTexts;
 	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(RandomTexts, account, email, friends, id, isAccountCreated, maximumAccountCreationDate,
+				products, roles);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		return Objects.equals(RandomTexts, other.RandomTexts) && Objects.equals(account, other.account)
+				&& Objects.equals(email, other.email) && Objects.equals(friends, other.friends) && id == other.id
+				&& isAccountCreated == other.isAccountCreated
+				&& Objects.equals(maximumAccountCreationDate, other.maximumAccountCreationDate)
+				&& Objects.equals(products, other.products) && Objects.equals(roles, other.roles);
+	}
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", email=" + email + ", isAccountCreated=" + isAccountCreated
+				+ ", maximumAccountCreationDate=" + maximumAccountCreationDate + ", account=" + account + ", roles="
+				+ roles + ", friends=" + friends + ", products=" + products + ", RandomTexts=" + RandomTexts + "]";
+	}
 	
 	public static Builder builder() {
 		return new Builder();
@@ -131,6 +171,7 @@ public class User {
 		private int id;
 		private String email;
 		private boolean isAccountCreated;
+		private Date maximumAccountCreationDate;
 		private Account account;
 		private List<UserRole> roles = Collections.emptyList();
 		private List<Friend> friends = Collections.emptyList();
@@ -152,6 +193,11 @@ public class User {
 
 		public Builder withIsAccountCreated(boolean isAccountCreated) {
 			this.isAccountCreated = isAccountCreated;
+			return this;
+		}
+
+		public Builder withMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+			this.maximumAccountCreationDate = maximumAccountCreationDate;
 			return this;
 		}
 
@@ -184,5 +230,6 @@ public class User {
 			return new User(this);
 		}
 	}
+
 	
 }

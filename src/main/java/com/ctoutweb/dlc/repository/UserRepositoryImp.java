@@ -76,9 +76,10 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
 					.withIsAccountCreated(rs.getBoolean("isAccountCreated"))
+					.withMaximumAccountCreationDate(rs.getTimestamp("maximum_account_creation_date"))
 					.build(), userId);
 			
-			findUser.setAccount(accountRepository.findAccountById(userId).orElse(null));
+			findUser.setAccount(accountRepository.findAccountByUserId(userId).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
 			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
 			findUser.setProducts(productRepository.findProductsByUserId(userId));
@@ -100,10 +101,11 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)-> User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withIsAccountCreated(rs.getBoolean("is_account_created"))					
+					.withIsAccountCreated(rs.getBoolean("is_account_created"))
+					.withMaximumAccountCreationDate(rs.getTimestamp("maximum_account_creation_date"))
 					.build(),
 					email);			
-			findUser.setAccount(accountRepository.findAccountById(findUser.getId()).orElse(null));
+			findUser.setAccount(accountRepository.findAccountByUserId(findUser.getId()).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(findUser.getId()));
 			findUser.setRandomTexts(randomTextUserRepository.findByUserI(findUser.getId()));
 			

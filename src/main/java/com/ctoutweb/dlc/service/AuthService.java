@@ -5,7 +5,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -22,6 +24,7 @@ import com.ctoutweb.dlc.entity.UserEntity;
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.EncryptionException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
+import com.ctoutweb.dlc.model.RandomTextUser;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
@@ -82,49 +85,6 @@ public class AuthService {
 		this.randomTextUserRepository = randomTextUserRepository;
 	}
 	
-	public RegisterEmailResponse registerMailingLink(RegisterEmailRequest request) {
-		try {
-			String user = User.builder().withId(1).build().toString();
-			
-			String[] imageName = new String[] {"avion", "ciseau", "poile"};
-			
-			//String encryptData = aesEncryption.encrypt(imageName);
-			String encryptData = aesEncryption.encryptArray(imageName);
-			String decryptData = aesEncryption.decrypt(encryptData);
-			String[] data = decryptData.split(",");
-			
-			System.out.println(encryptData);
-			System.out.println(decryptData);
-			System.out.println(data[1]);
-			
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		
-		//mailService.sendEmail(request.getSubject(), request.getRecipientMail());			
-		return RegisterEmailResponse.builder().withMessage("ddd").build();
-	}
-
-	
 	public RegisterEmailResponse registerEmail(RegisterEmailRequest request) {
 		try {
 			// Vérifier que les données atttendu sont présentes
@@ -149,8 +109,8 @@ public class AuthService {
 			EncryptRandomWordResponse emailConfirmationString = randomWordService.encryptRandomWord(randomWordService.generateRandom(45));
 			
 			// save mot chiffré et info du mail en bdd
-			randomWordService.saveEncryptedWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTER);
-			randomWordService.saveEncryptedWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.EMAILCONFIRMATION);
+			randomWordService.saveEncryptedRandomWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTER);
+			randomWordService.saveEncryptedRandomWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.EMAILCONFIRMATION);
 			
 			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
 			listWordsToReplaceInHtmlTemplate.put("token", randomString);
@@ -182,24 +142,38 @@ public class AuthService {
 	}
 	
 	public CreateAccountResponse createAccount(CreateAccountRequest request) {
-		// vérifier les données envoyées
-		
-		// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
-		User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
-		System.out.println("user.getRandomTexts()");
-		user.getRandomTexts().forEach(e->System.out.println(e.getExpiredAt()));
-		
-		// Vérifier validité token + token registerurl
-		
-		// vérifier expired_at
-		
-		// créer le compte
-		
-		// supprimer les données dans random table
-		
-		// renvoyer la réponse
-		CreateAccountResponse response = CreateAccountResponse.builder().withMessage("").build();
-		return response;
+		try {
+			// vérifier les données envoyées
+			
+			// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
+			User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
+			
+			// Récupération des randomTexts
+			List<RandomTextUser> randomTextUser = user.getRandomTexts();
+			
+			// Vérifier validité code de confirmation client et code confirmation chiffré en base de données
+			RandomTextUser emailToken = randomTextUser.stream()
+					.filter(random->random.getCategoryId() == RandomCategory.EMAILCONFIRMATION.getIndex())
+					.findFirst()
+					.get();
+			
+			System.out.println(emailToken.getRandomText());
+			randomWordService.isEncryptedRandomWordValid("", "",emailToken.getIv());
+			
+			// vérifier expired_at
+			
+			// créer le compte
+			
+			// supprimer les données dans random table
+			
+			// renvoyer la réponse
+			CreateAccountResponse response = CreateAccountResponse.builder().withMessage(emailToken.getRandomText()).build();
+			return response;
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | 				InvalidKeySpecException e) {
+			//userRepository.deleteByEmail(request.getEmail());
+			e.printStackTrace();
+			throw new EncryptionException(e.getMessage());
+		}
 	}
 	
 	public LoginResponse authenticate(LoginRequest request) {		
