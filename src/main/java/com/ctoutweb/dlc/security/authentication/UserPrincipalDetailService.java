@@ -36,6 +36,7 @@ public class UserPrincipalDetailService implements UserDetailsService {
 				.withPassword(user.getAccount().getPassword())
 				.withIsAccountActive(user.getAccount().getIsAccountActive())
 				.withAuthorities(convertListOfRoleToSimpleGrantedAuth(user.getRoles()))
+				.withMaximumAccountActivationDate(user.getAccount().getMaximumAccountActivationDate())
 				.build();
 	}
 	

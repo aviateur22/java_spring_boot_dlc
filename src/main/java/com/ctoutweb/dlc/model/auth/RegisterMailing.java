@@ -7,15 +7,17 @@ import com.ctoutweb.dlc.service.mail.EmailSubject;
 
 import java.util.Collections;
 
-public class RegisterMailingRequest {
+public class RegisterMailing {
 	private EmailSubject emailSubject;
 	private String email;
 	private Map<String, String> wordsToReplaceInHtmlTemplate;
-
-	private RegisterMailingRequest(Builder builder) {
+	private String exceptionMessage;
+	
+	private RegisterMailing(Builder builder) {
 		this.emailSubject = builder.emailSubject;
 		this.email = builder.email;
 		this.wordsToReplaceInHtmlTemplate = builder.wordsToReplaceInHtmlTemplate;
+		this.exceptionMessage = builder.exceptionMessage;
 	}
 	/**
 	 * @return the emailSubject
@@ -53,9 +55,21 @@ public class RegisterMailingRequest {
 	public void setWordsToReplaceInHtmlTemplate(Map<String, String> wordsToReplaceInHtmlTemplate) {
 		this.wordsToReplaceInHtmlTemplate = wordsToReplaceInHtmlTemplate;
 	}
+	/**
+	 * @return the exceptionMessage
+	 */
+	public String getExceptionMessage() {
+		return exceptionMessage;
+	}
+	/**
+	 * @param exceptionMessage the exceptionMessage to set
+	 */
+	public void setExceptionMessage(String exceptionMessage) {
+		this.exceptionMessage = exceptionMessage;
+	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(email, emailSubject, wordsToReplaceInHtmlTemplate);
+		return Objects.hash(email, emailSubject, exceptionMessage, wordsToReplaceInHtmlTemplate);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -65,14 +79,15 @@ public class RegisterMailingRequest {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RegisterMailingRequest other = (RegisterMailingRequest) obj;
+		RegisterMailing other = (RegisterMailing) obj;
 		return Objects.equals(email, other.email) && emailSubject == other.emailSubject
+				&& Objects.equals(exceptionMessage, other.exceptionMessage)
 				&& Objects.equals(wordsToReplaceInHtmlTemplate, other.wordsToReplaceInHtmlTemplate);
 	}
 	@Override
 	public String toString() {
-		return "RegisterMailingRequest [emailSubject=" + emailSubject + ", email=" + email
-				+ ", wordsToReplaceInHtmlTemplate=" + wordsToReplaceInHtmlTemplate + "]";
+		return "RegisterMailing [emailSubject=" + emailSubject + ", email=" + email + ", wordsToReplaceInHtmlTemplate="
+				+ wordsToReplaceInHtmlTemplate + ", exceptionMessage=" + exceptionMessage + "]";
 	}
 	
 	public static Builder builder() {
@@ -83,6 +98,7 @@ public class RegisterMailingRequest {
 		private EmailSubject emailSubject;
 		private String email;
 		private Map<String, String> wordsToReplaceInHtmlTemplate = Collections.emptyMap();
+		private String exceptionMessage;
 
 		private Builder() {
 		}
@@ -102,9 +118,16 @@ public class RegisterMailingRequest {
 			return this;
 		}
 
-		public RegisterMailingRequest build() {
-			return new RegisterMailingRequest(this);
+		public Builder withExceptionMessage(String exceptionMessage) {
+			this.exceptionMessage = exceptionMessage;
+			return this;
+		}
+
+		public RegisterMailing build() {
+			return new RegisterMailing(this);
 		}
 	}
+	
+	
 	
 }

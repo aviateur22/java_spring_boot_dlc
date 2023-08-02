@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collections;
+import java.util.Date;
 
 public class UserPrincipal implements UserDetails {
 	
@@ -13,6 +14,7 @@ public class UserPrincipal implements UserDetails {
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 	private boolean isAccountActive;
+	private Date maximumAccountActivationDate;
 	
 	private UserPrincipal(Builder builder) {
 		this.id = builder.id;
@@ -20,6 +22,7 @@ public class UserPrincipal implements UserDetails {
 		this.password = builder.password;
 		this.authorities = builder.authorities;
 		this.isAccountActive = builder.isAccountActive;
+		this.maximumAccountActivationDate = builder.maximumAccountActivationDate;
 	}
 
 	public int getId() {
@@ -63,8 +66,8 @@ public class UserPrincipal implements UserDetails {
 	}
 
 	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
+	public boolean isEnabled() {		
+		if( !isAccountActive && (maximumAccountActivationDate.compareTo(new Date()) >= 0)) return true;
 		return isAccountActive;
 	}
 	
@@ -78,6 +81,7 @@ public class UserPrincipal implements UserDetails {
 		private String password;
 		private Collection<? extends GrantedAuthority> authorities = Collections.emptyList();
 		private boolean isAccountActive;
+		private Date maximumAccountActivationDate;
 
 		private Builder() {
 		}
@@ -104,6 +108,11 @@ public class UserPrincipal implements UserDetails {
 
 		public Builder withIsAccountActive(boolean isAccountActive) {
 			this.isAccountActive = isAccountActive;
+			return this;
+		}
+		
+		public Builder withMaximumAccountActivationDate(Date maximumAccountActivationDate) {
+			this.maximumAccountActivationDate = maximumAccountActivationDate;
 			return this;
 		}
 

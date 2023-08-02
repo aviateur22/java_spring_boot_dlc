@@ -5,7 +5,8 @@ import java.util.Optional;
 
 public enum EmailSubject {
 	REGISTER(1),
-	RESETPASSWORD(2);
+	RESETPASSWORD(2),
+	ACTIVATEACCOUNT(3);
 	
 	private int subjectValue;
 	

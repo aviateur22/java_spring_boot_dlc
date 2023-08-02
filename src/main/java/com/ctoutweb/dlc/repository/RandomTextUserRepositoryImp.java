@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import com.ctoutweb.dlc.entity.RandomTextUserEntity;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.RandomTextUser;
-import com.ctoutweb.dlc.model.User;
 
 @Repository
 public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTextUserRepository {

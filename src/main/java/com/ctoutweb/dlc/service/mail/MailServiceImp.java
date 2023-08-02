@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.model.EmailTemplateInformation;
-import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailing;
 
 import jakarta.mail.internet.MimeMessage;
 
@@ -24,7 +24,7 @@ public class MailServiceImp implements MailService {
 
 
 	@Override
-	public void sendEmail(RegisterMailingRequest registerMailing)  {
+	public void sendEmail(RegisterMailing registerMailing)  {
 		try {
 			
 			EmailTemplateInformation emailInformation = htmlTemplateService.getTemplateFromFile(registerMailing);			
@@ -37,12 +37,12 @@ public class MailServiceImp implements MailService {
 			mailSender.send(message);
 		} catch (Exception ex) {				
 			ex.printStackTrace();
-			throw new EmailException("erreur lors de l'envoie de l'email d'inscription");
+			throw new EmailException(registerMailing.getExceptionMessage());
 		}	
 	}
 
 	@Override
-	public void sendEmailWithAttachment(RegisterMailingRequest registerMailing) {
+	public void sendEmailWithAttachment(RegisterMailing registerMailing) {
 		// TODO Auto-generated method stub
 		
 	}

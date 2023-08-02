@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -23,20 +22,23 @@ import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.entity.AccountEntity;
 import com.ctoutweb.dlc.entity.UserEntity;
+import com.ctoutweb.dlc.exception.custom.ActivateAccountException;
 import com.ctoutweb.dlc.exception.custom.CreateAccountException;
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.EncryptionException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
-import com.ctoutweb.dlc.model.Account;
 import com.ctoutweb.dlc.model.RandomTextUser;
+import com.ctoutweb.dlc.model.SaveEncryptedRandomWord;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
+import com.ctoutweb.dlc.model.auth.ActivateAccountRequest;
+import com.ctoutweb.dlc.model.auth.ActivateAccountResponse;
 import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
 import com.ctoutweb.dlc.model.auth.CreateAccountResponse;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
-import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailing;
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
 import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
 import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
@@ -60,7 +62,6 @@ public class AuthService {
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
 	private final JwtIssuer jwtIssuer;
-	private final AesEncryptionService aesEncryption;
 	private final RandomImageService randomImageService;
 	private final RandomWordService randomWordService;
 	private final RandomTextUserRepository randomTextUserRepository;
@@ -73,8 +74,7 @@ public class AuthService {
 			JwtIssuer jwtIssuer, 
 			TokenService tokenService, 
 			PasswordEncoder passwordEncoder, 
-			MailService mailService, 
-			AesEncryptionService aesEncryption, 
+			MailService mailService, 			
 			RandomImageService randomImageService, 
 			RandomWordService randomWordService, 
 			RandomTextUserRepository randomTextUserRepository, 
@@ -86,7 +86,6 @@ public class AuthService {
 		this.userRepository = userRepository;
 		this.tokenService = tokenService;
 		this.jwtIssuer = jwtIssuer;
-		this.aesEncryption = aesEncryption;
 		this.randomImageService = randomImageService;
 		this.randomWordService = randomWordService;
 		this.randomTextUserRepository = randomTextUserRepository;
@@ -102,7 +101,11 @@ public class AuthService {
 			
 			// si ok: vérifier l'existrence de l'email en base de données
 			userRepository.findUserByEmail(request.getEmail()).ifPresent(user->{
-				throw new UserFindException("cet email est déja utilisé");
+				// On valide un email utilisé uniquement si le compte n'est pas créé
+				if(user.getIsAccountCreated()) throw new UserFindException("cet email est déja utilisé");
+				
+				// Suppression de l'ancien email
+				userRepository.deleteByEmail(request.getEmail());
 			});
 			
 			// si ok; enregistrer l'email
@@ -116,9 +119,21 @@ public class AuthService {
 			// générer un code de 45 lettres chiffrés
 			EncryptRandomWordResponse emailConfirmationString = randomWordService.encryptRandomWord(randomWordService.generateRandom(45), true);
 			
+			SaveEncryptedRandomWord saveEncryptedRandomString = SaveEncryptedRandomWord.builder()
+					.withUserId(userId)
+					.withEncryptedRandomWord(encryptedRandomString)
+					.withRandomCategory(RandomCategory.REGISTEREMAILTOKEN)
+					.build();
+			
+			SaveEncryptedRandomWord saveEmailConfirmationString = SaveEncryptedRandomWord.builder()
+					.withUserId(userId)
+					.withEncryptedRandomWord(emailConfirmationString)
+					.withRandomCategory(RandomCategory.URLTOKEN)
+					.build();
+			
 			// save mot chiffré et info du mail en bdd
-			randomWordService.saveEncryptedRandomWord(userId, encryptedRandomString.getEncryptRandomWord(), encryptedRandomString.getIvString(), RandomCategory.REGISTEREMAILTOKEN);
-			randomWordService.saveEncryptedRandomWord(userId, emailConfirmationString.getEncryptRandomWord(), emailConfirmationString.getIvString(), RandomCategory.URLTOKEN);
+			randomWordService.saveEncryptedRandomWord(saveEncryptedRandomString);
+			randomWordService.saveEncryptedRandomWord(saveEmailConfirmationString);
 			
 			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
 			listWordsToReplaceInHtmlTemplate.put("token", randomString);
@@ -126,10 +141,12 @@ public class AuthService {
 			listWordsToReplaceInHtmlTemplate.put("link", "auth/create-account/user/"+ request.getEmail() + "/confirmation/" + emailConfirmationString.getEncryptRandomWord());
 			
 			// envoyer un l'email
-			mailService.sendEmail(RegisterMailingRequest.builder()
+			mailService.sendEmail(RegisterMailing.builder()
 					.withWordsToReplaceInHtmlTemplate(listWordsToReplaceInHtmlTemplate)
 					.withEmail(request.getEmail())
-					.withEmailSubject(EmailSubject.REGISTER).build());
+					.withEmailSubject(EmailSubject.REGISTER)
+					.withExceptionMessage("erreur lors de l'envoie de l'email d'inscription")
+					.build());
 			
 			//envoyer la réponse au client			
 			RegisterEmailResponse response = RegisterEmailResponse.builder()
@@ -148,9 +165,7 @@ public class AuthService {
 	}
 	
 	public CreateAccountResponse createAccount(CreateAccountRequest request) {
-		try {
-			
-			
+		try {			
 			// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
 			User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new CreateAccountException("impossible de vérifier le code de confirmation"));
 			
@@ -161,10 +176,10 @@ public class AuthService {
 			List<RandomTextUser> randomTextUser = user.getRandomTexts();
 			
 			// vérifier le 'encryptedRandomURLToken	
-			this.createAccountHelper(randomTextUser, RandomCategory.URLTOKEN, true, request.getUrlToken(), true);
+			this.verifyClientTokenHelper(randomTextUser, RandomCategory.URLTOKEN, true, request.getUrlToken(), true);
 			
 			// Vérifier Token de 5 characteres
-			this.createAccountHelper(randomTextUser, RandomCategory.REGISTEREMAILTOKEN, false, request.getToken(), false);			
+			this.verifyClientTokenHelper(randomTextUser, RandomCategory.REGISTEREMAILTOKEN, false, request.getToken(), false);			
 						
 			// créer le compte
 			accountRepository.findAccountByUserId(user.getId()).ifPresent(account->accountRepository.deleteAccountByUserId(user.getId()));
@@ -185,8 +200,33 @@ public class AuthService {
 			// supprimer les données dans random table
 			randomTextUserRepository.deleteByUserId(user.getId());
 			
+			// générer un token pour activation account de 65 lettres chiffrés
+			EncryptRandomWordResponse activationAccountToken = randomWordService.encryptRandomWord(randomWordService.generateRandom(65), true);
+			
+			SaveEncryptedRandomWord encryptedRandomWord = SaveEncryptedRandomWord.builder()
+					.withUserId(user.getId())
+					.withEncryptedRandomWord(activationAccountToken)
+					.withRandomCategory(RandomCategory.ACTIVATEACCOUNTTOKEN)
+					.build();
+			
+			// save mot chiffré et info du mail en bdd			
+			randomWordService.saveEncryptedRandomWord(encryptedRandomWord);
+			
+			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
+			listWordsToReplaceInHtmlTemplate.put("email", user.getEmail());
+			listWordsToReplaceInHtmlTemplate.put("link", "auth/activate-account/user/"+ user.getEmail() + "/confirmation/" + activationAccountToken.getEncryptRandomWord());
+			
+			//Envoi d'un email d'activation de compte		
+			mailService.sendEmail(RegisterMailing.builder()
+					.withWordsToReplaceInHtmlTemplate(listWordsToReplaceInHtmlTemplate)
+					.withEmail(user.getEmail())
+					.withEmailSubject(EmailSubject.ACTIVATEACCOUNT)
+					.withExceptionMessage("erreur lors de l'envoie de l'email d'activation de compte")
+					.build());
+			
+
 			// renvoyer la réponse
-			CreateAccountResponse response = CreateAccountResponse.builder().withMessage("votre compte est créé").build();
+			CreateAccountResponse response = CreateAccountResponse.builder().withMessage("félicitation votre compte est créé, vous allez recevoir un email afin de pouvoir l'activer").build();
 			return response;
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | 				InvalidKeySpecException e) {
 			//userRepository.deleteByEmail(request.getEmail());
@@ -195,6 +235,27 @@ public class AuthService {
 		} catch(RuntimeException ex) {
 			throw new CreateAccountException(ex.getMessage());
 		}
+	}
+
+	public ActivateAccountResponse accountActivation(ActivateAccountRequest request) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+		// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
+		User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new ActivateAccountException("impossible d'activer votre compte"));
+		
+		// Récupération des randomTexts
+		List<RandomTextUser> randomTextUser = user.getRandomTexts();
+		
+		// vérifier le 'encryptedRandomURLToken	
+		this.verifyClientTokenHelper(randomTextUser, RandomCategory.ACTIVATEACCOUNTTOKEN, true, request.getActivationToken(), true);
+		
+		AccountEntity account = AccountEntity.builder()
+				.withAccountActivationAt(new Date())
+				.withIsAccountActive(true)
+				.withUpdatedAt(new Date())
+				.build();
+		
+		//accountRepository
+					
+		return ActivateAccountResponse.builder().withMessage("").build();
 	}
 	
 	public LoginResponse authenticate(LoginRequest request) {		
@@ -214,7 +275,7 @@ public class AuthService {
 		return LogoutResponse.builder().withMessage("à bientôt").build();
 	}
 	
-	private void createAccountHelper(List<RandomTextUser> randomTextUser, RandomCategory randomCategory, boolean isRandomWordEncrypted, String clientToken, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	private void verifyClientTokenHelper(List<RandomTextUser> randomTextUser, RandomCategory randomCategory, boolean isRandomWordEncrypted, String clientToken, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		// vérifier le 'encryptedRandomURLToken			
 		RandomTextUser token = randomTextUser.stream()
 				.filter(random->random.getCategoryId() == randomCategory.getIndex())

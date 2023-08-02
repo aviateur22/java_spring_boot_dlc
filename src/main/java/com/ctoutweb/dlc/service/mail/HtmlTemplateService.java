@@ -17,13 +17,14 @@ import javax.crypto.NoSuchPaddingException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.model.EmailTemplateInformation;
-import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailing;
 
 @Service
 public class HtmlTemplateService {	
 
-	public EmailTemplateInformation getTemplateFromFile(RegisterMailingRequest registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {	
+	public EmailTemplateInformation getTemplateFromFile(RegisterMailing registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {	
 		
 		
 		// Récupération template email
@@ -32,7 +33,7 @@ public class HtmlTemplateService {
 		return emailTemplateInformation;
 	}
 	
-	private EmailTemplateInformation getTemplateInformation(RegisterMailingRequest registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+	private EmailTemplateInformation getTemplateInformation(RegisterMailing registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		
 		switch (registerMailing.getEmailSubject()) {
 		case REGISTER:
@@ -49,8 +50,13 @@ public class HtmlTemplateService {
 				.withSubject("inscription à dlc")
 				.withTemplatePath("html/registerLink.html")
 				.build();
+		
+		case ACTIVATEACCOUNT: return EmailTemplateInformation.builder()
+				.withSubject("")
+				.withTemplatePath("html/activationAccount.html")
+				.build();
 		default:
-			throw new IllegalArgumentException("Unexpected value: ");
+			throw new EmailException("Impossible de créer le template HTML");
 		}
 	}	
 	

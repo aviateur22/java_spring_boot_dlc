@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.ctoutweb.dlc.exception.custom.ActivateAccountException;
 import com.ctoutweb.dlc.exception.custom.AnnotationException;
 import com.ctoutweb.dlc.exception.custom.CreateAccountException;
 import com.ctoutweb.dlc.exception.custom.EmailException;
@@ -113,10 +115,16 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
 	}
 	
+	@ExceptionHandler(value= {MaxUploadSizeExceededException.class})
+	public ResponseEntity<ErrorResponse> maxUploadSizeExceededException(MaxUploadSizeExceededException ex, WebRequest request){
+		return new ResponseEntity<ErrorResponse>(new ErrorResponse("le fichier est trop volumineux"), HttpStatusCode.valueOf(400));
+	}
+	
 	@ExceptionHandler(value = {AuthenticationException.class})
 	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
 		System.out.println("kfmfkgfmmùfkgfgkfgfkgfs");
 		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
+		
 		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
 		ex.printStackTrace();
 		return new ResponseEntity<ErrorResponse>(error, HttpStatusCode.valueOf(403));
@@ -130,6 +138,12 @@ public class HandlerException {
 	
 	@ExceptionHandler(value = {CreateAccountException.class})
 	public ResponseEntity<ErrorResponse> createAccountException(CreateAccountException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = {ActivateAccountException.class})
+	public ResponseEntity<ErrorResponse> activateAccountException(ActivateAccountException ex, WebRequest request){	
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}

@@ -17,10 +17,12 @@ public class FileNotNullValidator implements ConstraintValidator<FileNotNull, Mu
 	public boolean isValid(MultipartFile file, ConstraintValidatorContext context) {
 		
 		if(file.getSize() > 0 && !file.isEmpty()) {
+			System.out.println("image valide");
 			System.out.println(file.getSize());
 			return true;
 		}		
-		
+		System.out.println("image pas valide");
+		System.out.println(message);
 		context.buildConstraintViolationWithTemplate(message)     
         .addConstraintViolation()
         .disableDefaultConstraintViolation();

@@ -1,8 +1,8 @@
 package com.ctoutweb.dlc.service.mail;
 
-import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
+import com.ctoutweb.dlc.model.auth.RegisterMailing;
 
 public interface MailService {
-	void sendEmail(RegisterMailingRequest registerMailing);
-	void sendEmailWithAttachment(RegisterMailingRequest registerMailing);
+	void sendEmail(RegisterMailing registerMailing);
+	void sendEmailWithAttachment(RegisterMailing registerMailing);
 }

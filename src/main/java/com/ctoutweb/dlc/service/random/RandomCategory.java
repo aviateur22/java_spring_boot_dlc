@@ -6,7 +6,8 @@ import java.util.Optional;
 public enum RandomCategory {
 	REGISTEREMAILTOKEN(1),
 	RESETPASSWORDTOKEN(2),
-	URLTOKEN(3);
+	URLTOKEN(3),
+	ACTIVATEACCOUNTTOKEN(4);
 	
 	private int index;
 	

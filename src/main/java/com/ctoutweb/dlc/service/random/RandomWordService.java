@@ -14,6 +14,7 @@ import javax.crypto.NoSuchPaddingException;
 import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.entity.RandomTextUserEntity;
+import com.ctoutweb.dlc.model.SaveEncryptedRandomWord;
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
 import com.ctoutweb.dlc.repository.RandomTextUserRepository;
 import com.ctoutweb.dlc.service.AesEncryptionService;
@@ -50,15 +51,15 @@ public class RandomWordService {
 		return EncryptRandomWordResponse.builder().withEncryptRandomWord(encryptRandomWord).withIvString(ivToString).build();
 	}
 	
-	public void saveEncryptedRandomWord(int userId, String EncryptedRandomWord, String iv, RandomCategory randomCategory) {
+	public void saveEncryptedRandomWord(SaveEncryptedRandomWord encryptedRandomWord) {
 		
-		randomTextUserRepository.findByUserIdAndCategoryId(userId, randomCategory.getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
+		randomTextUserRepository.findByUserIdAndCategoryId(encryptedRandomWord.getUserId(), encryptedRandomWord.getRandomCategory().getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
 	
 		RandomTextUserEntity randomTextUserEntity = RandomTextUserEntity.builder()
-		.withCategoryId(randomCategory.getIndex())
-		.withIv(iv)
-		.withUserId(userId)
-		.withRandomText(EncryptedRandomWord)
+		.withCategoryId(encryptedRandomWord.getRandomCategory().getIndex())
+		.withIv(encryptedRandomWord.getEncryptedRandomWord().getIvString())
+		.withRandomText(encryptedRandomWord.getEncryptedRandomWord().getEncryptRandomWord())
+		.withUserId(encryptedRandomWord.getUserId())
 		.build();
 		
 		randomTextUserRepository.save(randomTextUserEntity);
@@ -66,12 +67,6 @@ public class RandomWordService {
 	
 	public boolean isDecryptedRandomWordValid(String decryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
 		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase, isUrlBase64);		
-		System.out.println("debut");
-		System.out.println(decryptedRandomWordFromClient);
-		System.out.println(encryptedRandomWordFromDatabase);
-		System.out.println(decryptRandomWordFromDatabase);
-		System.out.println(decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase));
-		System.out.println("Fin");
 		return decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase);
 	}
 	
