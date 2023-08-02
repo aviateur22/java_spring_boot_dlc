@@ -70,4 +70,17 @@ public class AccountRepositoryImp extends IdKeyHolder implements AccountReposito
 		return deleteRow;
 	}
 
+	@Override
+	public int updateAccountByUserId(AccountEntity account) {
+		String query = "UPDATE accounts SET is_account_active=:isAccountActive, account_activation_at=:accountActivationAt, updated_at=:updatedAt WHERE user_id=:userId";
+		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(account);
+		int updatedRow = namedParameterJdbcTemplate.update(query, sqlParam);
+		
+		if(updatedRow == 0) throw new InsertSQLException("probleme update account");
+		
+		return updatedRow;
+	}
+	
+	
+
 }

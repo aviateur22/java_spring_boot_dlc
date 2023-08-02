@@ -14,7 +14,8 @@ import javax.crypto.NoSuchPaddingException;
 import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.entity.RandomTextUserEntity;
-import com.ctoutweb.dlc.model.SaveEncryptedRandomWord;
+import com.ctoutweb.dlc.model.SaveEncryptedRandomToken;
+import com.ctoutweb.dlc.model.VerifyClientToken;
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
 import com.ctoutweb.dlc.repository.RandomTextUserRepository;
 import com.ctoutweb.dlc.service.AesEncryptionService;
@@ -37,12 +38,9 @@ public class RandomWordService {
 				.filter(num->(num < 58 || num > 64) && (num < 91 || num > 96))
 				.limit(wordLength)
 				.mapToObj(c->(char) c).collect(StringBuffer::new , StringBuffer::append, StringBuffer::append)
-				.toString();
-		
+				.toString();		
 		return str.toLowerCase();
 	}
-	
-
 	
 	public EncryptRandomWordResponse encryptRandomWord(String text, boolean isUrlBase64) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		byte[] iv = aesEncyptionService.generateRandomByte();
@@ -51,12 +49,12 @@ public class RandomWordService {
 		return EncryptRandomWordResponse.builder().withEncryptRandomWord(encryptRandomWord).withIvString(ivToString).build();
 	}
 	
-	public void saveEncryptedRandomWord(SaveEncryptedRandomWord encryptedRandomWord) {
+	public void saveEncryptedRandomWord(SaveEncryptedRandomToken encryptedRandomWord) {
 		
-		randomTextUserRepository.findByUserIdAndCategoryId(encryptedRandomWord.getUserId(), encryptedRandomWord.getRandomCategory().getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
+		randomTextUserRepository.findByUserIdAndCategoryId(encryptedRandomWord.getUserId(), encryptedRandomWord.getRandomTokenCategory().getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
 	
 		RandomTextUserEntity randomTextUserEntity = RandomTextUserEntity.builder()
-		.withCategoryId(encryptedRandomWord.getRandomCategory().getIndex())
+		.withCategoryId(encryptedRandomWord.getRandomTokenCategory().getIndex())
 		.withIv(encryptedRandomWord.getEncryptedRandomWord().getIvString())
 		.withRandomText(encryptedRandomWord.getEncryptedRandomWord().getEncryptRandomWord())
 		.withUserId(encryptedRandomWord.getUserId())
@@ -65,19 +63,30 @@ public class RandomWordService {
 		randomTextUserRepository.save(randomTextUserEntity);
 	}
 	
-	public boolean isDecryptedRandomWordValid(String decryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
-		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase, isUrlBase64);		
-		return decryptedRandomWordFromClient.equals(decryptRandomWordFromDatabase);
+	public boolean isDecryptedRandomWordValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+		String decryptTokenFromDatabase = decryptToken(
+				tokenClientToVerify.getTokenFromDatabase().getToken(), 
+				tokenClientToVerify.getTokenFromDatabase().getIv(), 
+				tokenClientToVerify.getIsBase64Url());		
+		return tokenClientToVerify.getClientToken().equals(decryptTokenFromDatabase);
 	}
 	
-	public boolean isEncryptedRandomWordValid(String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-		String decryptRandomWordFromClient = decryptRandomWord(encryptedRandomWordFromClient, ivFromDatabase, isUrlBase64);
-		String decryptRandomWordFromDatabase = decryptRandomWord(encryptedRandomWordFromDatabase, ivFromDatabase, isUrlBase64);
+	public boolean isEncryptedRandomWordValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+		//String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase6
+		String decryptTokenFromClient = decryptToken(
+				tokenClientToVerify.getClientToken(),
+				tokenClientToVerify.getTokenFromDatabase().getIv(),
+				tokenClientToVerify.getIsBase64Url());
 		
-		return decryptRandomWordFromClient.equals(decryptRandomWordFromDatabase);
+		String decryptTokenFromDatabase = decryptToken(
+				tokenClientToVerify.getTokenFromDatabase().getToken(),
+				tokenClientToVerify.getTokenFromDatabase().getIv(),
+				tokenClientToVerify.getIsBase64Url());
+		
+		return decryptTokenFromClient.equals(decryptTokenFromDatabase);
 	}
 	
-	private String decryptRandomWord(String encryptedRandomWord, String ivString, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	private String decryptToken(String encryptedRandomWord, String ivString, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		byte[] iv = Base64.getDecoder().decode(ivString.getBytes());
 		String decryptRandomString = aesEncyptionService.decrypt(encryptedRandomWord, iv, isUrlBase64);
 		return decryptRandomString;

@@ -3,13 +3,10 @@ package com.ctoutweb.dlc.model.auth;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.ctoutweb.dlc.annotation.password.PasswordMatcher;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@PasswordMatcher(message = "erreur confirmation mot de passe")
 public class RegisterEmailRequest {
 	@NotNull(message = "l'email obligatoire")
 	@NotBlank(message = "l'email obligatoire")

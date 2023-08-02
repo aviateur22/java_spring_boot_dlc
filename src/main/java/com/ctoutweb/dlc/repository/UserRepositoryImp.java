@@ -83,7 +83,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
 			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
 			findUser.setProducts(productRepository.findProductsByUserId(userId));
-			findUser.setRandomTexts(randomTextUserRepository.findByUserI(userId));
+			findUser.setRandomConfirmationTokens(randomTextUserRepository.findByUserI(userId));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -107,7 +107,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					email);			
 			findUser.setAccount(accountRepository.findAccountByUserId(findUser.getId()).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(findUser.getId()));
-			findUser.setRandomTexts(randomTextUserRepository.findByUserI(findUser.getId()));
+			findUser.setRandomConfirmationTokens(randomTextUserRepository.findByUserI(findUser.getId()));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {

@@ -34,7 +34,7 @@ public class HtmlTemplateService {
 	}
 	
 	private EmailTemplateInformation getTemplateInformation(RegisterMailing registerMailing) throws IOException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-		
+				
 		switch (registerMailing.getEmailSubject()) {
 		case REGISTER:
 			
@@ -47,13 +47,17 @@ public class HtmlTemplateService {
 					.build();
 		
 		case RESETPASSWORD: return EmailTemplateInformation.builder()
-				.withSubject("inscription à dlc")
+				.withSubject("Création de votre compte à DLC")
 				.withTemplatePath("html/registerLink.html")
 				.build();
 		
-		case ACTIVATEACCOUNT: return EmailTemplateInformation.builder()
-				.withSubject("")
-				.withTemplatePath("html/activationAccount.html")
+		case ACTIVATEACCOUNT:
+			htmlTemplate = getHtmlTemplate("templates/html/activationAccount.html", registerMailing.getWordsToReplaceInHtmlTemplate()) ;
+			
+			return EmailTemplateInformation.builder()
+				.withSubject("activation de votre compte à DLC")
+				.withTemplatePath("templates/html/activationAccount.html")
+				.withTemplateContent(htmlTemplate)
 				.build();
 		default:
 			throw new EmailException("Impossible de créer le template HTML");

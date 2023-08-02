@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ctoutweb.dlc.entity.RandomTextUserEntity;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
-import com.ctoutweb.dlc.model.RandomTextUser;
+import com.ctoutweb.dlc.model.RandomConfirmationToken;
 
 @Repository
 public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTextUserRepository {
@@ -62,15 +62,15 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 	}
 
 	@Override
-	public List<RandomTextUser> findByUserI(int userId) {
+	public List<RandomConfirmationToken> findByUserI(int userId) {
 		String query = "SELECT rtu.id, rtu.random_text, rtu.iv, rtu.expired_at, rtc.id AS rtcId, rtc.category "
 				+ "FROM random_text_user AS rtu "
 				+ "JOIN random_text_categories AS rtc "
 				+ "ON rtu.random_category_id = rtc.id "
 				+ "WHERE rtu.user_id = ?";
 		
-		List<RandomTextUser> findUserRandomText = jdbcTemplate.query(query, 
-				(rs, rowNum)-> RandomTextUser.builder()
+		List<RandomConfirmationToken> findUserRandomText = jdbcTemplate.query(query, 
+				(rs, rowNum)-> RandomConfirmationToken.builder()
 				.withId(rs.getInt("id"))
 				.withCategory(rs.getString("category"))
 				.withCategoryId(rs.getInt("rtcId"))

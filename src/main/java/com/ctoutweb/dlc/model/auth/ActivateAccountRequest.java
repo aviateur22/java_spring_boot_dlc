@@ -2,8 +2,18 @@ package com.ctoutweb.dlc.model.auth;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ActivateAccountRequest {
+	@Email(message="format de l'email invalide")
+	@NotNull(message ="l'email obligatoire")
+	@NotBlank(message="l'email obligatoire")
 	private String email;
+	
+	@NotNull(message ="token obligatoire")
+	@NotBlank(message="token obligatoire")
 	private String activationToken;
 	/**
 	 * @return the email

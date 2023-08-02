@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -122,7 +123,9 @@ public class HandlerException {
 	
 	@ExceptionHandler(value = {AuthenticationException.class})
 	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
-		System.out.println("kfmfkgfmmùfkgfgkfgfkgfs");
+		System.out.println(ex.getMessage());
+		System.out.println(ex);
+		ex.printStackTrace();
 		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
 		
 		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
@@ -144,6 +147,12 @@ public class HandlerException {
 	
 	@ExceptionHandler(value = {ActivateAccountException.class})
 	public ResponseEntity<ErrorResponse> activateAccountException(ActivateAccountException ex, WebRequest request){	
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = {NoHandlerFoundException.class})
+	public ResponseEntity<ErrorResponse> noHandlerFoundException(NoHandlerFoundException ex, WebRequest request){	
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}

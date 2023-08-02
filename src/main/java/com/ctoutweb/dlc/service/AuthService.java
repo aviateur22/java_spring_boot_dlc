@@ -26,11 +26,13 @@ import com.ctoutweb.dlc.exception.custom.ActivateAccountException;
 import com.ctoutweb.dlc.exception.custom.CreateAccountException;
 import com.ctoutweb.dlc.exception.custom.EmailException;
 import com.ctoutweb.dlc.exception.custom.EncryptionException;
+import com.ctoutweb.dlc.exception.custom.TokenException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
-import com.ctoutweb.dlc.model.RandomTextUser;
-import com.ctoutweb.dlc.model.SaveEncryptedRandomWord;
+import com.ctoutweb.dlc.model.RandomConfirmationToken;
+import com.ctoutweb.dlc.model.SaveEncryptedRandomToken;
 import com.ctoutweb.dlc.model.TokenIssue;
 import com.ctoutweb.dlc.model.User;
+import com.ctoutweb.dlc.model.VerifyClientToken;
 import com.ctoutweb.dlc.model.auth.ActivateAccountRequest;
 import com.ctoutweb.dlc.model.auth.ActivateAccountResponse;
 import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
@@ -49,8 +51,8 @@ import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.security.token.JwtIssuer;
 import com.ctoutweb.dlc.service.mail.EmailSubject;
 import com.ctoutweb.dlc.service.mail.MailService;
-import com.ctoutweb.dlc.service.random.RandomCategory;
 import com.ctoutweb.dlc.service.random.RandomImageService;
+import com.ctoutweb.dlc.service.random.RandomTokenCategory;
 import com.ctoutweb.dlc.service.random.RandomWordService;
 
 @Service
@@ -119,16 +121,16 @@ public class AuthService {
 			// générer un code de 45 lettres chiffrés
 			EncryptRandomWordResponse emailConfirmationString = randomWordService.encryptRandomWord(randomWordService.generateRandom(45), true);
 			
-			SaveEncryptedRandomWord saveEncryptedRandomString = SaveEncryptedRandomWord.builder()
+			SaveEncryptedRandomToken saveEncryptedRandomString = SaveEncryptedRandomToken.builder()
 					.withUserId(userId)
 					.withEncryptedRandomWord(encryptedRandomString)
-					.withRandomCategory(RandomCategory.REGISTEREMAILTOKEN)
+					.withRandomTokenCategory(RandomTokenCategory.REGISTEREMAILTOKEN)
 					.build();
 			
-			SaveEncryptedRandomWord saveEmailConfirmationString = SaveEncryptedRandomWord.builder()
+			SaveEncryptedRandomToken saveEmailConfirmationString = SaveEncryptedRandomToken.builder()
 					.withUserId(userId)
 					.withEncryptedRandomWord(emailConfirmationString)
-					.withRandomCategory(RandomCategory.URLTOKEN)
+					.withRandomTokenCategory(RandomTokenCategory.URLTOKEN)
 					.build();
 			
 			// save mot chiffré et info du mail en bdd
@@ -173,14 +175,26 @@ public class AuthService {
 			if(user.getIsAccountCreated()) throw new CreateAccountException("votre compte est déja créé");
 				
 			// Récupération des randomTexts
-			List<RandomTextUser> randomTextUser = user.getRandomTexts();
+			List<RandomConfirmationToken> userRandomConfirmationTokens = user.getRandomConfirmationTokens();
 			
 			// vérifier le 'encryptedRandomURLToken	
-			this.verifyClientTokenHelper(randomTextUser, RandomCategory.URLTOKEN, true, request.getUrlToken(), true);
+			this.verifyClientTokenHelper(VerifyClientToken.builder() 
+					.withUserRandomConfirmationTokens(userRandomConfirmationTokens)
+					.withRandomTokenCategory(RandomTokenCategory.URLTOKEN)
+					.withIsTokenEncrypted(true)
+					.withClientToken(request.getUrlToken())
+					.withIsBase64Url(true)
+					.build());
 			
 			// Vérifier Token de 5 characteres
-			this.verifyClientTokenHelper(randomTextUser, RandomCategory.REGISTEREMAILTOKEN, false, request.getToken(), false);			
-						
+			this.verifyClientTokenHelper(VerifyClientToken.builder() 
+					.withUserRandomConfirmationTokens(userRandomConfirmationTokens)
+					.withRandomTokenCategory(RandomTokenCategory.REGISTEREMAILTOKEN)
+					.withIsTokenEncrypted(false)
+					.withClientToken(request.getToken())
+					.withIsBase64Url(false)
+					.build());						
+			
 			// créer le compte
 			accountRepository.findAccountByUserId(user.getId()).ifPresent(account->accountRepository.deleteAccountByUserId(user.getId()));
 			accountRepository.saveAccount(AccountEntity.builder()
@@ -203,10 +217,10 @@ public class AuthService {
 			// générer un token pour activation account de 65 lettres chiffrés
 			EncryptRandomWordResponse activationAccountToken = randomWordService.encryptRandomWord(randomWordService.generateRandom(65), true);
 			
-			SaveEncryptedRandomWord encryptedRandomWord = SaveEncryptedRandomWord.builder()
+			SaveEncryptedRandomToken encryptedRandomWord = SaveEncryptedRandomToken.builder()
 					.withUserId(user.getId())
 					.withEncryptedRandomWord(activationAccountToken)
-					.withRandomCategory(RandomCategory.ACTIVATEACCOUNTTOKEN)
+					.withRandomTokenCategory(RandomTokenCategory.ACTIVATEACCOUNTTOKEN)
 					.build();
 			
 			// save mot chiffré et info du mail en bdd			
@@ -237,25 +251,44 @@ public class AuthService {
 		}
 	}
 
-	public ActivateAccountResponse accountActivation(ActivateAccountRequest request) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	public ActivateAccountResponse accountActivation(ActivateAccountRequest request) {
+		try {
 		// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
 		User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new ActivateAccountException("impossible d'activer votre compte"));
 		
 		// Récupération des randomTexts
-		List<RandomTextUser> randomTextUser = user.getRandomTexts();
+		List<RandomConfirmationToken> userRandomConfirmationTokens = user.getRandomConfirmationTokens();
 		
 		// vérifier le 'encryptedRandomURLToken	
-		this.verifyClientTokenHelper(randomTextUser, RandomCategory.ACTIVATEACCOUNTTOKEN, true, request.getActivationToken(), true);
+		this.verifyClientTokenHelper(VerifyClientToken.builder() 
+				.withUserRandomConfirmationTokens(userRandomConfirmationTokens)
+				.withRandomTokenCategory(RandomTokenCategory.ACTIVATEACCOUNTTOKEN)
+				.withIsTokenEncrypted(true)
+				.withClientToken(request.getActivationToken())
+				.withIsBase64Url(true)
+				.build());
 		
 		AccountEntity account = AccountEntity.builder()
+				.withUserId(user.getId())
 				.withAccountActivationAt(new Date())
 				.withIsAccountActive(true)
 				.withUpdatedAt(new Date())
 				.build();
 		
-		//accountRepository
-					
-		return ActivateAccountResponse.builder().withMessage("").build();
+		accountRepository.updateAccountByUserId(account);
+		
+		return ActivateAccountResponse.builder().withMessage("félicitation votre compte est activé").build();
+		
+		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new EncryptionException(e.getMessage());
+		} catch(RuntimeException ex) {
+			ex.printStackTrace();
+			throw new ActivateAccountException(ex.getMessage());
+		}
+		
+		
 	}
 	
 	public LoginResponse authenticate(LoginRequest request) {		
@@ -275,21 +308,23 @@ public class AuthService {
 		return LogoutResponse.builder().withMessage("à bientôt").build();
 	}
 	
-	private void verifyClientTokenHelper(List<RandomTextUser> randomTextUser, RandomCategory randomCategory, boolean isRandomWordEncrypted, String clientToken, boolean isUrlBase64) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	private void verifyClientTokenHelper(VerifyClientToken verifyClientToken) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		// vérifier le 'encryptedRandomURLToken			
-		RandomTextUser token = randomTextUser.stream()
-				.filter(random->random.getCategoryId() == randomCategory.getIndex())
+		RandomConfirmationToken tokenFromDatabase = verifyClientToken.getUserRandomConfirmationTokens()
+				.stream()
+				.filter(random->random.getCategoryId() == verifyClientToken.getRandomTokenCategory().getIndex())
 				.findFirst()
-				.orElseThrow(()-> new CreateAccountException("impossible de vérifier le code de confirmation"));
+				.orElseThrow(()-> new TokenException("impossible de vérifier le code de confirmation"));
 		
+		verifyClientToken.setTokenFromDatabase(tokenFromDatabase);
 		// Vérifier expiredAt
-		if(token.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException("le delais de création d'un compte est expiré. Merci de vous réinscrire");
+		if(tokenFromDatabase.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException(verifyClientToken.getExceptionMessage());
 		
 		//Vérification urlToken  avec le code présent en base de donnée
-		if(isRandomWordEncrypted) {
-			if(!randomWordService.isEncryptedRandomWordValid(clientToken, token.getRandomText(), token.getIv(), isUrlBase64)) throw new CreateAccountException("le code de confirmation n'est pas correcte");			
+		if(verifyClientToken.getIsTokenEncrypted()) {
+			if(!randomWordService.isEncryptedRandomWordValid(verifyClientToken)) throw new TokenException("le code de confirmation n'est pas correcte");			
 		} else {
-			if(!randomWordService.isDecryptedRandomWordValid(clientToken, token.getRandomText(), token.getIv(), isUrlBase64)) throw new CreateAccountException("le code de confirmation n'est pas correcte");
+			if(!randomWordService.isDecryptedRandomWordValid(verifyClientToken)) throw new TokenException("le code de confirmation n'est pas correcte");
 		}
 	}
 	

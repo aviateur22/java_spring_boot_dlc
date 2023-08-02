@@ -15,7 +15,7 @@ public class User {
 	private List<UserRole> roles;
 	private List<Friend> friends;
 	private List<Product> products;
-	private List<RandomTextUser> RandomTexts;
+	private List<RandomConfirmationToken> randomConfirmationTokens;
 	
 	private User(Builder builder) {
 		this.id = builder.id;
@@ -26,7 +26,7 @@ public class User {
 		this.roles = builder.roles;
 		this.friends = builder.friends;
 		this.products = builder.products;
-		this.RandomTexts = builder.RandomTexts;
+		this.randomConfirmationTokens = builder.randomConfirmationTokens;
 	}
 	/**
 	 * @return the id
@@ -127,18 +127,18 @@ public class User {
 	/**
 	 * @return the randomTexts
 	 */
-	public List<RandomTextUser> getRandomTexts() {
-		return RandomTexts;
+	public List<RandomConfirmationToken> getRandomConfirmationTokens() {
+		return randomConfirmationTokens;
 	}
 	/**
 	 * @param randomTexts the randomTexts to set
 	 */
-	public void setRandomTexts(List<RandomTextUser> randomTexts) {
-		RandomTexts = randomTexts;
+	public void setRandomConfirmationTokens(List<RandomConfirmationToken> randomConfirmationTokens) {
+		this.randomConfirmationTokens = randomConfirmationTokens;
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(RandomTexts, account, email, friends, id, isAccountCreated, maximumAccountCreationDate,
+		return Objects.hash(randomConfirmationTokens, account, email, friends, id, isAccountCreated, maximumAccountCreationDate,
 				products, roles);
 	}
 	@Override
@@ -150,7 +150,7 @@ public class User {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		return Objects.equals(RandomTexts, other.RandomTexts) && Objects.equals(account, other.account)
+		return Objects.equals(randomConfirmationTokens, other.randomConfirmationTokens) && Objects.equals(account, other.account)
 				&& Objects.equals(email, other.email) && Objects.equals(friends, other.friends) && id == other.id
 				&& isAccountCreated == other.isAccountCreated
 				&& Objects.equals(maximumAccountCreationDate, other.maximumAccountCreationDate)
@@ -160,7 +160,7 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", isAccountCreated=" + isAccountCreated
 				+ ", maximumAccountCreationDate=" + maximumAccountCreationDate + ", account=" + account + ", roles="
-				+ roles + ", friends=" + friends + ", products=" + products + ", RandomTexts=" + RandomTexts + "]";
+				+ roles + ", friends=" + friends + ", products=" + products + ", RandomTexts=" + randomConfirmationTokens + "]";
 	}
 	
 	public static Builder builder() {
@@ -176,7 +176,7 @@ public class User {
 		private List<UserRole> roles = Collections.emptyList();
 		private List<Friend> friends = Collections.emptyList();
 		private List<Product> products = Collections.emptyList();
-		private List<RandomTextUser> RandomTexts = Collections.emptyList();
+		private List<RandomConfirmationToken> randomConfirmationTokens = Collections.emptyList();
 
 		private Builder() {
 		}
@@ -221,8 +221,8 @@ public class User {
 			return this;
 		}
 
-		public Builder withRandomTexts(List<RandomTextUser> RandomTexts) {
-			this.RandomTexts = RandomTexts;
+		public Builder withRandomTexts(List<RandomConfirmationToken> randomConfirmationTokens) {
+			this.randomConfirmationTokens = randomConfirmationTokens;
 			return this;
 		}
 

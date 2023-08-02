@@ -10,5 +10,6 @@ public interface AccountRepository {
 	Optional<Account> findAccountById(int id);
 	Optional<Account> findAccountByUserId(int userId);
 	int deleteAccountByUserId(int userId);
+	int updateAccountByUserId(AccountEntity account);
 	
 }

@@ -2,17 +2,17 @@ package com.ctoutweb.dlc.model;
 
 import java.util.Date;
 
-public class RandomTextUser {
+public class RandomConfirmationToken {
 	private int id;
-	private String randomText;
+	private String token;
 	private String iv;
 	private Date expiredAt;
 	private String category;
 	private int categoryId;
 
-	private RandomTextUser(Builder builder) {
+	private RandomConfirmationToken(Builder builder) {
 		this.id = builder.id;
-		this.randomText = builder.randomText;
+		this.token = builder.token;
 		this.iv = builder.iv;
 		this.expiredAt = builder.expiredAt;
 		this.category = builder.category;
@@ -33,14 +33,14 @@ public class RandomTextUser {
 	/**
 	 * @return the randomText
 	 */
-	public String getRandomText() {
-		return randomText;
+	public String getToken() {
+		return token;
 	}
 	/**
 	 * @param randomText the randomText to set
 	 */
-	public void setRandomText(String randomText) {
-		this.randomText = randomText;
+	public void setToken(String token) {
+		this.token = token;
 	}
 	/**
 	 * @return the iv
@@ -97,7 +97,7 @@ public class RandomTextUser {
 
 	public static final class Builder {
 		private int id;
-		private String randomText;
+		private String token;
 		private String iv;
 		private Date expiredAt;
 		private String category;
@@ -111,8 +111,8 @@ public class RandomTextUser {
 			return this;
 		}
 
-		public Builder withRandomText(String randomText) {
-			this.randomText = randomText;
+		public Builder withRandomText(String token) {
+			this.token = token;
 			return this;
 		}
 
@@ -136,8 +136,8 @@ public class RandomTextUser {
 			return this;
 		}
 
-		public RandomTextUser build() {
-			return new RandomTextUser(this);
+		public RandomConfirmationToken build() {
+			return new RandomConfirmationToken(this);
 		}
 	}
 	

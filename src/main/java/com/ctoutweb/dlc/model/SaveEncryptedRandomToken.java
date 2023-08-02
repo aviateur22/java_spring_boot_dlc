@@ -3,16 +3,16 @@ package com.ctoutweb.dlc.model;
 import java.util.Objects;
 
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
-import com.ctoutweb.dlc.service.random.RandomCategory;
+import com.ctoutweb.dlc.service.random.RandomTokenCategory;
 
-public class SaveEncryptedRandomWord {
+public class SaveEncryptedRandomToken {
 	private EncryptRandomWordResponse encryptedRandomWord;
-	private RandomCategory randomCategory;
+	private RandomTokenCategory randomTokenCategory;
 	private int userId;
 
-	private SaveEncryptedRandomWord(Builder builder) {
+	private SaveEncryptedRandomToken(Builder builder) {
 		this.encryptedRandomWord = builder.encryptedRandomWord;
-		this.randomCategory = builder.randomCategory;
+		this.randomTokenCategory = builder.randomTokenCategory;
 		this.userId = builder.userId;
 	}
 	/**
@@ -28,16 +28,16 @@ public class SaveEncryptedRandomWord {
 		this.encryptedRandomWord = encryptedRandomWord;
 	}
 	/**
-	 * @return the randomCategory
+	 * @return the randomTokenCategory
 	 */
-	public RandomCategory getRandomCategory() {
-		return randomCategory;
+	public RandomTokenCategory getRandomTokenCategory() {
+		return randomTokenCategory;
 	}
 	/**
-	 * @param randomCategory the randomCategory to set
+	 * @param randomTokenCategory the randomTokenCategory to set
 	 */
-	public void setRandomCategory(RandomCategory randomCategory) {
-		this.randomCategory = randomCategory;
+	public void setRandomTokenCategory(RandomTokenCategory randomTokenCategory) {
+		this.randomTokenCategory = randomTokenCategory;
 	}
 	/**
 	 * @return the userId
@@ -53,7 +53,7 @@ public class SaveEncryptedRandomWord {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(encryptedRandomWord, randomCategory, userId);
+		return Objects.hash(encryptedRandomWord, randomTokenCategory, userId);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -63,14 +63,14 @@ public class SaveEncryptedRandomWord {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SaveEncryptedRandomWord other = (SaveEncryptedRandomWord) obj;
-		return Objects.equals(encryptedRandomWord, other.encryptedRandomWord) && randomCategory == other.randomCategory
-				&& userId == other.userId;
+		SaveEncryptedRandomToken other = (SaveEncryptedRandomToken) obj;
+		return Objects.equals(encryptedRandomWord, other.encryptedRandomWord)
+				&& randomTokenCategory == other.randomTokenCategory && userId == other.userId;
 	}
 	@Override
 	public String toString() {
-		return "SaveEncryptedRandomWord [encryptedRandomWord=" + encryptedRandomWord + ", randomCategory="
-				+ randomCategory + ", userId=" + userId + "]";
+		return "SaveEncryptedRandomWord [encryptedRandomWord=" + encryptedRandomWord + ", randomTokenCategory="
+				+ randomTokenCategory + ", userId=" + userId + "]";
 	}
 
 	public static Builder builder() {
@@ -79,7 +79,7 @@ public class SaveEncryptedRandomWord {
 
 	public static final class Builder {
 		private EncryptRandomWordResponse encryptedRandomWord;
-		private RandomCategory randomCategory;
+		private RandomTokenCategory randomTokenCategory;
 		private int userId;
 
 		private Builder() {
@@ -90,8 +90,8 @@ public class SaveEncryptedRandomWord {
 			return this;
 		}
 
-		public Builder withRandomCategory(RandomCategory randomCategory) {
-			this.randomCategory = randomCategory;
+		public Builder withRandomTokenCategory(RandomTokenCategory randomTokenCategory) {
+			this.randomTokenCategory = randomTokenCategory;
 			return this;
 		}
 
@@ -100,11 +100,10 @@ public class SaveEncryptedRandomWord {
 			return this;
 		}
 
-		public SaveEncryptedRandomWord build() {
-			return new SaveEncryptedRandomWord(this);
+		public SaveEncryptedRandomToken build() {
+			return new SaveEncryptedRandomToken(this);
 		}
 	}
-	
-	
+
 	
 }
