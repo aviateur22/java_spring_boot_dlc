@@ -30,6 +30,8 @@ public class UserPrincipalDetailService implements UserDetailsService {
 		
 		User user = userRepository.findUserByEmail(username).orElseThrow(()->new UserNotFoundException("email ou mot de passe invalid"));
 		
+		if(user.getAccount() == null) throw new UserNotFoundException("email ou mot de passe invalid");
+		
 		return UserPrincipal.builder()
 				.withId(user.getId())
 				.withEmail(user.getEmail())
