@@ -135,7 +135,7 @@ public class HandlerException {
 	
 	@ExceptionHandler(value = {EncryptionException.class})
 	public ResponseEntity<ErrorResponse>EncryptionException(EncryptionException ex, WebRequest request){	
-		ErrorResponse error = new ErrorResponse("erreur chiffrement");
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	

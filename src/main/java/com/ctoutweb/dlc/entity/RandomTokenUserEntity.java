@@ -2,7 +2,7 @@ package com.ctoutweb.dlc.entity;
 
 import java.util.Date;
 
-public class RandomTextUserEntity {
+public class RandomTokenUserEntity {
 	private int id;
 	private String randomText;
 	private String iv;
@@ -12,7 +12,7 @@ public class RandomTextUserEntity {
 	private Date createdAt;
 	private Date updatedAt;
 
-	private RandomTextUserEntity(Builder builder) {
+	private RandomTokenUserEntity(Builder builder) {
 		this.id = builder.id;
 		this.randomText = builder.randomText;
 		this.iv = builder.iv;
@@ -176,8 +176,8 @@ public class RandomTextUserEntity {
 			return this;
 		}
 
-		public RandomTextUserEntity build() {
-			return new RandomTextUserEntity(this);
+		public RandomTokenUserEntity build() {
+			return new RandomTokenUserEntity(this);
 		}
 	}
 	

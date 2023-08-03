@@ -13,20 +13,20 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.springframework.stereotype.Service;
 
-import com.ctoutweb.dlc.entity.RandomTextUserEntity;
+import com.ctoutweb.dlc.entity.RandomTokenUserEntity;
 import com.ctoutweb.dlc.model.SaveEncryptedRandomToken;
 import com.ctoutweb.dlc.model.VerifyClientToken;
 import com.ctoutweb.dlc.model.encryption.EncryptRandomWordResponse;
-import com.ctoutweb.dlc.repository.RandomTextUserRepository;
+import com.ctoutweb.dlc.repository.RandomTokenUserRepository;
 import com.ctoutweb.dlc.service.AesEncryptionService;
 
 @Service
-public class RandomWordService {
+public class RandomTokenService {
 	
 	private final AesEncryptionService aesEncyptionService;
-	private final RandomTextUserRepository randomTextUserRepository;
+	private final RandomTokenUserRepository randomTextUserRepository;
 			
-	public RandomWordService(AesEncryptionService aesEncyptionService, RandomTextUserRepository randomTextUserRepository) {
+	public RandomTokenService(AesEncryptionService aesEncyptionService, RandomTokenUserRepository randomTextUserRepository) {
 		super();
 		this.aesEncyptionService = aesEncyptionService;
 		this.randomTextUserRepository = randomTextUserRepository;
@@ -53,7 +53,7 @@ public class RandomWordService {
 		
 		randomTextUserRepository.findByUserIdAndCategoryId(encryptedRandomWord.getUserId(), encryptedRandomWord.getRandomTokenCategory().getIndex()).ifPresent(data->randomTextUserRepository.delete(data.getId()));			
 	
-		RandomTextUserEntity randomTextUserEntity = RandomTextUserEntity.builder()
+		RandomTokenUserEntity randomTextUserEntity = RandomTokenUserEntity.builder()
 		.withCategoryId(encryptedRandomWord.getRandomTokenCategory().getIndex())
 		.withIv(encryptedRandomWord.getEncryptedRandomWord().getIvString())
 		.withRandomText(encryptedRandomWord.getEncryptedRandomWord().getEncryptRandomWord())
@@ -63,7 +63,7 @@ public class RandomWordService {
 		randomTextUserRepository.save(randomTextUserEntity);
 	}
 	
-	public boolean isDecryptedRandomWordValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+	public boolean isDecryptedRandomTokenValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
 		String decryptTokenFromDatabase = decryptToken(
 				tokenClientToVerify.getTokenFromDatabase().getToken(), 
 				tokenClientToVerify.getTokenFromDatabase().getIv(), 
@@ -71,7 +71,7 @@ public class RandomWordService {
 		return tokenClientToVerify.getClientToken().equals(decryptTokenFromDatabase);
 	}
 	
-	public boolean isEncryptedRandomWordValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
+	public boolean isEncryptedRandomTokenValid(VerifyClientToken tokenClientToVerify) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		//String encryptedRandomWordFromClient, String encryptedRandomWordFromDatabase, String ivFromDatabase, boolean isUrlBase6
 		String decryptTokenFromClient = decryptToken(
 				tokenClientToVerify.getClientToken(),

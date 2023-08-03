@@ -11,17 +11,17 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
-import com.ctoutweb.dlc.entity.RandomTextUserEntity;
+import com.ctoutweb.dlc.entity.RandomTokenUserEntity;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.RandomConfirmationToken;
 
 @Repository
-public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTextUserRepository {
+public class RandomTokenUserRepositoryImp extends IdKeyHolder implements RandomTokenUserRepository {
 
 	private final JdbcTemplate jdbcTemplate;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate; 
 	
-	public RandomTextUserRepositoryImp(JdbcTemplate jdbcTemplate,
+	public RandomTokenUserRepositoryImp(JdbcTemplate jdbcTemplate,
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
@@ -29,9 +29,9 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 	}
 
 	@Override
-	public int save(RandomTextUserEntity randomTextUser) {
+	public int save(RandomTokenUserEntity randomTextUser) {
 		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(randomTextUser);		
-		String userQuery = "INSERT INTO random_text_user (random_text, iv, user_id, random_category_id) VALUES (:randomText, :iv, :userId, :categoryId)";		
+		String userQuery = "INSERT INTO random_token_user (random_text, iv, user_id, random_category_id) VALUES (:randomText, :iv, :userId, :categoryId)";		
 		int insertRow = namedParameterJdbcTemplate.update(userQuery, sqlParam, this.keyHolder);		
 		
 		if(this.isKeyHolderOrInsertRowUnvalid(insertRow)) throw new InsertSQLException("probleme insertion user");		
@@ -41,18 +41,18 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 
 	@Override
 	public int delete(int id) {
-		String query = "DELETE FROM random_text_user WHERE id = ?";
+		String query = "DELETE FROM random_token_user WHERE id = ?";
 		int deleteRow = jdbcTemplate.update(query, id);
 		
-		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomToken");		
 		return deleteRow;
 	}
 
 	@Override
-	public Optional<RandomTextUserEntity> findByUserIdAndCategoryId(int userId, int categoryId) {
+	public Optional<RandomTokenUserEntity> findByUserIdAndCategoryId(int userId, int categoryId) {
 		try {
-			String query = "SELECT * FROM random_text_user WHERE user_id = ? AND random_category_id = ?";
-			RandomTextUserEntity findRandomText = jdbcTemplate.queryForObject(query, BeanPropertyRowMapper.newInstance(RandomTextUserEntity.class), userId, categoryId);
+			String query = "SELECT * FROM random_token_user WHERE user_id = ? AND random_category_id = ?";
+			RandomTokenUserEntity findRandomText = jdbcTemplate.queryForObject(query, BeanPropertyRowMapper.newInstance(RandomTokenUserEntity.class), userId, categoryId);
 			return Optional.of(findRandomText);
 			
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -64,8 +64,8 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 	@Override
 	public List<RandomConfirmationToken> findByUserI(int userId) {
 		String query = "SELECT rtu.id, rtu.random_text, rtu.iv, rtu.expired_at, rtc.id AS rtcId, rtc.category "
-				+ "FROM random_text_user AS rtu "
-				+ "JOIN random_text_categories AS rtc "
+				+ "FROM random_token_user AS rtu "
+				+ "JOIN random_token_categories AS rtc "
 				+ "ON rtu.random_category_id = rtc.id "
 				+ "WHERE rtu.user_id = ?";
 		
@@ -84,10 +84,19 @@ public class RandomTextUserRepositoryImp extends IdKeyHolder implements RandomTe
 
 	@Override
 	public int deleteByUserId(int userId) {
-		String query = "DELETE FROM random_text_user WHERE user_id = ?";
+		String query = "DELETE FROM random_token_user WHERE user_id = ?";
 		int deleteRow = jdbcTemplate.update(query, userId);
 		
-		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomToken");		
+		return deleteRow;
+	}
+
+	@Override
+	public int deleteByTokenCategoryIdAndUserId(int userId, int tokenCategoryId) {
+		String query = "DELETE FROM random_token_user WHERE user_id = ? AND random_category_id = ?";
+		int deleteRow = jdbcTemplate.update(query, userId, tokenCategoryId);
+		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomToken");		
 		return deleteRow;
 	}
 

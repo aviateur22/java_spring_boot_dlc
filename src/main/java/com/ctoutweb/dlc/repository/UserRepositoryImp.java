@@ -27,7 +27,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 	private final ProductRepository productRepository;
 	private final FriendsRepository friendRepository;
 	private final AccountRepository accountRepository;
-	private final RandomTextUserRepository randomTextUserRepository;
+	private final RandomTokenUserRepository randomTextUserRepository;
 
 	public UserRepositoryImp(JdbcTemplate jdbcTemplate, 
 			RoleUserRepository roleUserRepository, 
@@ -35,7 +35,7 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 			ProductRepository productRepository, 
 			FriendsRepository friendRepository, 
 			AccountRepository accountRepository, 
-			RandomTextUserRepository randomTextUserRepository) {
+			RandomTokenUserRepository randomTextUserRepository) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;

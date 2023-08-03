@@ -28,6 +28,19 @@ public class User {
 		this.products = builder.products;
 		this.randomConfirmationTokens = builder.randomConfirmationTokens;
 	}
+	
+	public User(User user) {
+		this.id = user.id;
+		this.email = user.email;
+		this.isAccountCreated = user.isAccountCreated;
+		this.maximumAccountCreationDate = user.maximumAccountCreationDate;
+		this.account = user.account;
+		this.roles = user.roles;
+		this.friends = user.friends;
+		this.products = user.products;
+		this.randomConfirmationTokens = user.randomConfirmationTokens;
+	}
+	
 	/**
 	 * @return the id
 	 */
