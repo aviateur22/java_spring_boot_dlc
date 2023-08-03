@@ -1,5 +1,6 @@
 package com.ctoutweb.dlc.annotation;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,15 +20,20 @@ public class AnnotationValidator <T> {
 
 	public void validate(T request) {
 		Set<ConstraintViolation<T>> validationErros = validator.validate(request);
-		
+		String lastErrorElement = null;
 		if(!validationErros.isEmpty()) {
-			String firstError = validationErros
+			Set<String> errorsMessage = validationErros
 				.stream()
 				.map(error->error.getMessage())
-				.collect(Collectors.toSet())
-				.iterator().next();
-			System.out.println(firstError);
-			throw new AnnotationException(firstError);
+				.collect(Collectors.toSet());	
+			
+			Iterator<String> errorsMessageIterator = errorsMessage.iterator();
+			while(errorsMessageIterator.hasNext()){
+				lastErrorElement = errorsMessageIterator.next();
+				
+			}
+			
+			throw new AnnotationException(lastErrorElement);
 			
 		}
 		

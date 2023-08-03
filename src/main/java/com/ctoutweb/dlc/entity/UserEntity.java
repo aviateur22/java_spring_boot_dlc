@@ -6,22 +6,16 @@ import java.util.Objects;
 public class UserEntity {
 	private int id;
 	private String email;
-	private String password;
-	private boolean isAccountActive;
-	private Date accountActivationAt;
-	private Date maximumAccountActivationDate;
-	private Date lastLoginAt;
+	private boolean isAccountCreated;
+	private Date maximumAccountCreationDate;
 	private Date createdAt;
 	private Date updatedAt;
 	
 	private UserEntity(Builder builder) {
 		this.id = builder.id;
 		this.email = builder.email;
-		this.password = builder.password;
-		this.isAccountActive = builder.isAccountActive;
-		this.accountActivationAt = builder.accountActivationAt;
-		this.maximumAccountActivationDate = builder.maximumAccountActivationDate;
-		this.lastLoginAt = builder.lastLoginAt;
+		this.isAccountCreated = builder.isAccountCreated;
+		this.maximumAccountCreationDate = builder.maximumAccountCreationDate;
 		this.createdAt = builder.createdAt;
 		this.updatedAt = builder.updatedAt;
 	}
@@ -50,64 +44,28 @@ public class UserEntity {
 		this.email = email;
 	}
 	/**
-	 * @return the password
+	 * @return the isAccountCreated
 	 */
-	public String getPassword() {
-		return password;
+	public boolean getIsAccountCreated() {
+		return isAccountCreated;
 	}
 	/**
-	 * @param password the password to set
+	 * @param isAccountCreated the isAccountCreated to set
 	 */
-	public void setPassword(String password) {
-		this.password = password;
+	public void setAccountCreated(boolean isAccountCreated) {
+		this.isAccountCreated = isAccountCreated;
 	}
 	/**
-	 * @return the isAccountActive
+	 * @return the maximumAccountCreationDate
 	 */
-	public boolean isAccountActive() {
-		return isAccountActive;
+	public Date getMaximumAccountCreationDate() {
+		return maximumAccountCreationDate;
 	}
 	/**
-	 * @param isAccountActive the isAccountActive to set
+	 * @param maximumAccountCreationDate the maximumAccountCreationDate to set
 	 */
-	public void setAccountActive(boolean isAccountActive) {
-		this.isAccountActive = isAccountActive;
-	}
-	/**
-	 * @return the accountActivationAt
-	 */
-	public Date getAccountActivationAt() {
-		return accountActivationAt;
-	}
-	/**
-	 * @param accountActivationAt the accountActivationAt to set
-	 */
-	public void setAccountActivationAt(Date accountActivationAt) {
-		this.accountActivationAt = accountActivationAt;
-	}
-	/**
-	 * @return the maximumAccountActivationDate
-	 */
-	public Date getMaximumAccountActivationDate() {
-		return maximumAccountActivationDate;
-	}
-	/**
-	 * @param maximumAccountActivationDate the maximumAccountActivationDate to set
-	 */
-	public void setMaximumAccountActivationDate(Date maximumAccountActivationDate) {
-		this.maximumAccountActivationDate = maximumAccountActivationDate;
-	}
-	/**
-	 * @return the lastLoginAt
-	 */
-	public Date getLastLoginAt() {
-		return lastLoginAt;
-	}
-	/**
-	 * @param lastLoginAt the lastLoginAt to set
-	 */
-	public void setLastLoginAt(Date lastLoginAt) {
-		this.lastLoginAt = lastLoginAt;
+	public void setMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+		this.maximumAccountCreationDate = maximumAccountCreationDate;
 	}
 	/**
 	 * @return the createdAt
@@ -135,8 +93,7 @@ public class UserEntity {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(accountActivationAt, createdAt, email, id, isAccountActive, lastLoginAt,
-				maximumAccountActivationDate, password, updatedAt);
+		return Objects.hash(createdAt, email, id, isAccountCreated, maximumAccountCreationDate, updatedAt);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -147,32 +104,27 @@ public class UserEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		UserEntity other = (UserEntity) obj;
-		return Objects.equals(accountActivationAt, other.accountActivationAt)
-				&& Objects.equals(createdAt, other.createdAt) && Objects.equals(email, other.email) && id == other.id
-				&& isAccountActive == other.isAccountActive && Objects.equals(lastLoginAt, other.lastLoginAt)
-				&& Objects.equals(maximumAccountActivationDate, other.maximumAccountActivationDate)
-				&& Objects.equals(password, other.password) && Objects.equals(updatedAt, other.updatedAt);
+		return Objects.equals(createdAt, other.createdAt) && Objects.equals(email, other.email) && id == other.id
+				&& isAccountCreated == other.isAccountCreated
+				&& Objects.equals(maximumAccountCreationDate, other.maximumAccountCreationDate)
+				&& Objects.equals(updatedAt, other.updatedAt);
 	}
 	@Override
 	public String toString() {
-		return "UserEntity [id=" + id + ", email=" + email + ", password=" + password + ", isAccountActive="
-				+ isAccountActive + ", accountActivationAt=" + accountActivationAt + ", maximumAccountActivationDate="
-				+ maximumAccountActivationDate + ", lastLoginAt=" + lastLoginAt + ", createdAt=" + createdAt
+		return "UserEntity [id=" + id + ", email=" + email + ", isAccountCreated=" + isAccountCreated
+				+ ", maximumAccountCreationDate=" + maximumAccountCreationDate + ", createdAt=" + createdAt
 				+ ", updatedAt=" + updatedAt + "]";
 	}
-
+	
 	public static Builder builder() {
 		return new Builder();
 	}
-
+	
 	public static final class Builder {
 		private int id;
 		private String email;
-		private String password;
-		private boolean isAccountActive;
-		private Date accountActivationAt;
-		private Date maximumAccountActivationDate;
-		private Date lastLoginAt;
+		private boolean isAccountCreated;
+		private Date maximumAccountCreationDate;
 		private Date createdAt;
 		private Date updatedAt;
 
@@ -189,28 +141,13 @@ public class UserEntity {
 			return this;
 		}
 
-		public Builder withPassword(String password) {
-			this.password = password;
+		public Builder withIsAccountCreated(boolean isAccountCreated) {
+			this.isAccountCreated = isAccountCreated;
 			return this;
 		}
 
-		public Builder withIsAccountActive(boolean isAccountActive) {
-			this.isAccountActive = isAccountActive;
-			return this;
-		}
-
-		public Builder withAccountActivationAt(Date accountActivationAt) {
-			this.accountActivationAt = accountActivationAt;
-			return this;
-		}
-
-		public Builder withMaximumAccountActivationDate(Date maximumAccountActivationDate) {
-			this.maximumAccountActivationDate = maximumAccountActivationDate;
-			return this;
-		}
-
-		public Builder withLastLoginAt(Date lastLoginAt) {
-			this.lastLoginAt = lastLoginAt;
+		public Builder withMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+			this.maximumAccountCreationDate = maximumAccountCreationDate;
 			return this;
 		}
 

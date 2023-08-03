@@ -2,17 +2,16 @@ package com.ctoutweb.dlc.model.auth;
 
 import com.ctoutweb.dlc.model.MessageResponse;
 
-public class RegisterMailingResponse extends MessageResponse {
+public class CreateAccountResponse extends MessageResponse {
 
-	
-	private RegisterMailingResponse(Builder builder) {
+	private CreateAccountResponse(Builder builder) {
 		this.message = builder.message;
 	}
-
+	
 	public static Builder builder() {
 		return new Builder();
 	}
-
+	
 	public static final class Builder {
 		private String message;
 
@@ -24,8 +23,8 @@ public class RegisterMailingResponse extends MessageResponse {
 			return this;
 		}
 
-		public RegisterMailingResponse build() {
-			return new RegisterMailingResponse(this);
+		public CreateAccountResponse build() {
+			return new CreateAccountResponse(this);
 		}
 	}
 	

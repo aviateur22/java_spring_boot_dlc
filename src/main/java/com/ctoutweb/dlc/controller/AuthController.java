@@ -10,13 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ctoutweb.dlc.annotation.AnnotationValidator;
+import com.ctoutweb.dlc.model.auth.ActivateAccountRequest;
+import com.ctoutweb.dlc.model.auth.ActivateAccountResponse;
+import com.ctoutweb.dlc.model.auth.CreateAccountRequest;
+import com.ctoutweb.dlc.model.auth.CreateAccountResponse;
 import com.ctoutweb.dlc.model.auth.LoginRequest;
 import com.ctoutweb.dlc.model.auth.LoginResponse;
 import com.ctoutweb.dlc.model.auth.LogoutResponse;
-import com.ctoutweb.dlc.model.auth.RegisterMailingRequest;
-import com.ctoutweb.dlc.model.auth.RegisterMailingResponse;
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
-import com.ctoutweb.dlc.model.auth.RegisterResponse;
+import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
+import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
 import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
 
@@ -25,17 +27,23 @@ import com.ctoutweb.dlc.service.AuthService;
 public class AuthController {
 	
 	private final AuthService authService;	
-	private final AnnotationValidator<RegisterRequest> annotationValidtorRegister;
+	private final AnnotationValidator<RegisterEmailRequest> annotationValidatorRegisterEmail;
+	private final AnnotationValidator<CreateAccountRequest> annotationValidtorCreateAccount;
+	private final AnnotationValidator<ActivateAccountRequest> annotationValidtorActivateAccount;
 	private final AnnotationValidator<LoginRequest> annotationValidtorLogin;
 	
 	public AuthController(
 			AuthService authService,			 
-			AnnotationValidator<RegisterRequest> annotationValidtorRegister, 
-			AnnotationValidator<LoginRequest> annotationValidtorLogin		
+			AnnotationValidator<CreateAccountRequest> annotationValidtorCreateAccount, 
+			AnnotationValidator<LoginRequest> annotationValidtorLogin, 
+			AnnotationValidator<RegisterEmailRequest> annotationValidatorRegisterEmail,
+			AnnotationValidator<ActivateAccountRequest> annotationValidtorActivateAccount		
 			) {
 		super();
-		this.authService = authService;		
-		this.annotationValidtorRegister = annotationValidtorRegister;
+		this.authService = authService;
+		this.annotationValidatorRegisterEmail = annotationValidatorRegisterEmail;		
+		this.annotationValidtorCreateAccount = annotationValidtorCreateAccount;
+		this.annotationValidtorActivateAccount = annotationValidtorActivateAccount;
 		this.annotationValidtorLogin = annotationValidtorLogin;
 	}
 
@@ -45,18 +53,27 @@ public class AuthController {
 		return new ResponseEntity<LoginResponse>(authService.authenticate(request), HttpStatus.OK);		
 	}
 	
-	@PostMapping("/register-mailing")
-	public ResponseEntity<RegisterMailingResponse> registerMailingLink(@RequestBody RegisterMailingRequest request) {
-		RegisterMailingResponse response = authService.registerMailingLink(request);
-		return new ResponseEntity<RegisterMailingResponse>(response, HttpStatus.CREATED);
+	@PostMapping("/register-email")
+	public ResponseEntity<RegisterEmailResponse> register(@RequestBody RegisterEmailRequest request){
+		annotationValidatorRegisterEmail.validate(request);		
+	
+		RegisterEmailResponse response = authService.registerEmail(request);
+		return new ResponseEntity<RegisterEmailResponse>(response, HttpStatus.CREATED);
 	}
 	
-	@PostMapping("/register")
-	public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request){
-		annotationValidtorRegister.validate(request);		
+	@PostMapping("/create-account")
+	public ResponseEntity<CreateAccountResponse> createAccount(@RequestBody CreateAccountRequest request){
+		annotationValidtorCreateAccount.validate(request);
+		
+		CreateAccountResponse response = authService.createAccount(request);
+		return new ResponseEntity<CreateAccountResponse>(response, HttpStatus.CREATED);
+	}
 	
-		RegisterResponse response = authService.register(request);
-		return new ResponseEntity<RegisterResponse>(response, HttpStatus.CREATED);
+	@PostMapping("/activate-account")
+	public ResponseEntity<ActivateAccountResponse> activateAccount(@RequestBody ActivateAccountRequest request){
+		annotationValidtorActivateAccount.validate(request);
+		ActivateAccountResponse response = authService.accountActivation(request);
+		return new ResponseEntity<ActivateAccountResponse>(response, HttpStatus.OK);
 	}
 	
 	@GetMapping("/logout")

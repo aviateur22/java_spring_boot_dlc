@@ -24,3 +24,4 @@ email.smtp-auth: true
 email.smtp-starttls-enable: true
 
 aes.key: hjdfjkdhldhljdfldmùmddùPQdùmslqdf,msqnflnfclqdsfldqjfcbdqcnlfdqmfmsfùmsqdjmjffcsqfjqsdjqsqsm
+aes.salt: 8E2EDB261622042C4BA537F970B842A22C48836BFBC9BEC8756DB400A41E41EAE2F628DE3F1F0A690AA57705CE62C5E9BCED67C8D5C22C17D735D0C137D7CC81

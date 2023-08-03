@@ -19,7 +19,6 @@ import com.ctoutweb.dlc.entity.ProductUserEntity;
 import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.Friend;
 import com.ctoutweb.dlc.model.Product;
-import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.service.storage.StorageService;
 
 @Repository

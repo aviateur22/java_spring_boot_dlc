@@ -1,4 +1,4 @@
-package com.ctoutweb.dlc.security;
+package com.ctoutweb.dlc.service;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -26,15 +26,15 @@ import com.ctoutweb.dlc.properties.AesProperties;
 
 
 @Component
-public class AesEncryption {
+public class AesEncryptionService {
 	
 	private final AesProperties aesProperties;
 	String algorithm = "AES/CBC/PKCS5Padding";
-	String salt = "fdgfggbhh";
+	String salt = "8E2EDB261622042C4BA537F970B842A22C48836BFBC9BEC8756DB400A41E41EAE2F628DE3F1F0A690AA57705CE62C5E9BCED67C8D5C22C17D735D0C137D7CC81";
 	//IvParameterSpec iv = generateIv();
 	byte[] iv = generateRandomByte();
     
-    public AesEncryption(AesProperties aesProperties) {
+    public AesEncryptionService(AesProperties aesProperties) {
 		super();
 		this.aesProperties = aesProperties;
 	}
@@ -47,7 +47,7 @@ public class AesEncryption {
 	    return secret;
 	}
 	
-	private byte[] generateRandomByte() {
+	public byte[] generateRandomByte() {
 	    byte[] iv = new byte[16];
 	    new SecureRandom().nextBytes(iv);
 	    return iv;
@@ -57,15 +57,17 @@ public class AesEncryption {
 	    return new IvParameterSpec(bytes);
 	}
 	
-	public String encrypt(String text) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+	public String encrypt(String text, byte[] iv, boolean isUrlBase64) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
 		Cipher cipher = Cipher.getInstance(this.algorithm);
 		SecretKey key = this.generateSecretKey();
-		System.out.println(iv);
 		cipher.init(Cipher.ENCRYPT_MODE,key, this.generateParameterSpecIv(iv));
-		byte[] cipherText = cipher.doFinal(text.getBytes());	
-	    return Base64.getEncoder()
-	        .encodeToString(cipherText);
+				
+		byte[] cipherText = cipher.doFinal(text.getBytes());
 		
+		if(isUrlBase64) return Base64.getUrlEncoder().encodeToString(cipherText);
+		
+	    return Base64.getEncoder()
+	        .encodeToString(cipherText);		
 	}
 	
 
@@ -83,16 +85,19 @@ public class AesEncryption {
 		
 	}
 	
-	public String decrypt(String cipherText) throws NoSuchPaddingException, NoSuchAlgorithmException,
+	public String decrypt(String cipherText, byte[] iv, boolean isUrlBase64) throws NoSuchPaddingException, NoSuchAlgorithmException,
 		    InvalidAlgorithmParameterException, InvalidKeyException,
-		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
-		
-			SecretKey key = this.generateSecretKey();
-			System.out.println("byte array = " + iv);
+		    BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {		
+			SecretKey key = this.generateSecretKey();			
 		    Cipher cipher = Cipher.getInstance(algorithm);
 		    cipher.init(Cipher.DECRYPT_MODE, key, this.generateParameterSpecIv(iv));
-		    byte[] plainText = cipher.doFinal(Base64.getDecoder()
-		        .decode(cipherText));
+		    
+		    if(isUrlBase64) {
+		    	 byte[] plainText = cipher.doFinal(Base64.getUrlDecoder().decode(cipherText));
+		    	 return new String(plainText);
+		    }		    
+		    
+		    byte[] plainText = cipher.doFinal(Base64.getDecoder().decode(cipherText));
 		    return new String(plainText);
 	}
 }

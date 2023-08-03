@@ -13,46 +13,48 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ctoutweb.dlc.entity.RoleUserEntity;
+import com.ctoutweb.dlc.entity.UserEntity;
+import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.model.User;
-import com.ctoutweb.dlc.model.auth.RegisterRequest;
 import com.ctoutweb.dlc.security.authentication.Role;
 
 @Repository
-public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
-	
-	// 1 vérifier existence email
-	// 2 ajouter email en bdd
-	// 3 
+public class UserRepositoryImp extends IdKeyHolder implements UserRepository{	
 	
 	private final JdbcTemplate jdbcTemplate;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate; 
 	private final RoleUserRepository roleUserRepository;
 	private final ProductRepository productRepository;
 	private final FriendsRepository friendRepository;
-	
+	private final AccountRepository accountRepository;
+	private final RandomTokenUserRepository randomTextUserRepository;
 
 	public UserRepositoryImp(JdbcTemplate jdbcTemplate, 
 			RoleUserRepository roleUserRepository, 
 			NamedParameterJdbcTemplate namedParameterJdbcTemplate, 
 			ProductRepository productRepository, 
-			FriendsRepository friendRepository) {
+			FriendsRepository friendRepository, 
+			AccountRepository accountRepository, 
+			RandomTokenUserRepository randomTextUserRepository) {
 		super();
 		this.jdbcTemplate = jdbcTemplate;
 		this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
 		this.roleUserRepository = roleUserRepository;
 		this.productRepository = productRepository;
 		this.friendRepository = friendRepository;
+		this.accountRepository = accountRepository;
+		this.randomTextUserRepository = randomTextUserRepository;
 	}
 
 	@Override
 	@Transactional
-	public int saveUser(RegisterRequest user) {		
+	public int saveUser(UserEntity user) {		
 		
 		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(user);		
-		String userQuery = "INSERT INTO users (email, password) VALUES (:email, :password)";		
+		String userQuery = "INSERT INTO users (email) VALUES (:email)";		
 		int insertRow = namedParameterJdbcTemplate.update(userQuery, sqlParam, this.keyHolder);		
 		
-		if(this.isKeyHolderOrInsertRowUnvalid(insertRow)) throw new RuntimeException("probleme insertion user");
+		if(this.isKeyHolderOrInsertRowUnvalid(insertRow)) throw new InsertSQLException("probleme insertion user");
 		
 		RoleUserEntity addUserRole = RoleUserEntity.builder()
 				.withRoleId(Role.ADMIN.getValue())
@@ -73,16 +75,15 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)->User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withPassword(rs.getString("password"))
-					.withLastLoginAt(rs.getTimestamp("last_login_at"))
-					.withCreatedAt(rs.getTimestamp("created_at"))
-					.withUpdatedAt(rs.getTimestamp("updated_at"))
-					.withIsAccountActive(rs.getBoolean("is_account_active"))
+					.withIsAccountCreated(rs.getBoolean("isAccountCreated"))
+					.withMaximumAccountCreationDate(rs.getTimestamp("maximum_account_creation_date"))
 					.build(), userId);
 			
+			findUser.setAccount(accountRepository.findAccountByUserId(userId).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(userId));
 			findUser.setFriends(friendRepository.findFriendsByUserId(userId));
 			findUser.setProducts(productRepository.findProductsByUserId(userId));
+			findUser.setRandomConfirmationTokens(randomTextUserRepository.findByUserI(userId));
 			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -100,17 +101,14 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 					(rs, rowNum)-> User.builder()
 					.withId(rs.getInt("id"))
 					.withEmail(rs.getString("email"))
-					.withPassword(rs.getString("password"))
-					.withLastLoginAt(rs.getTimestamp("last_login_at"))
-					.withCreatedAt(rs.getTimestamp("created_at"))
-					.withUpdatedAt(rs.getTimestamp("updated_at"))
-					.withIsAccountActive(rs.getBoolean("is_account_active"))
+					.withIsAccountCreated(rs.getBoolean("is_account_created"))
+					.withMaximumAccountCreationDate(rs.getTimestamp("maximum_account_creation_date"))
 					.build(),
-					email);
-			
-			
+					email);			
+			findUser.setAccount(accountRepository.findAccountByUserId(findUser.getId()).orElse(null));
 			findUser.setRoles(roleUserRepository.findUserRoleByUserId(findUser.getId()));
-			System.out.println(findUser);
+			findUser.setRandomConfirmationTokens(randomTextUserRepository.findByUserI(findUser.getId()));
+			
 			return Optional.of(findUser);
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return Optional.empty();
@@ -124,18 +122,13 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 				(rs, rowNum)->User.builder()
 				.withId(rs.getInt("id"))
 				.withEmail(rs.getString("email"))
-				.withPassword(rs.getString("password"))
-				.withLastLoginAt(rs.getTimestamp("last_login_at"))
-				.withCreatedAt(rs.getTimestamp("created_at"))
-				.withUpdatedAt(rs.getTimestamp("updated_at"))
-				.withIsAccountActive(rs.getBoolean("is_account_active"))
+				.withIsAccountCreated(rs.getBoolean("is_account_created"))
 				.build())
 		.stream()
 		.map(user->User.builder()
 				.withId(user.getId())
 				.withEmail(user.getEmail())
-				.withCreatedAt(user.getCreatedAt())
-				.withIsAccountActive(user.getIsAccountActive())
+				.withAccount(accountRepository.findAccountById(user.getId()).orElse(null))
 				.withRoles(roleUserRepository.findUserRoleByUserId(user.getId()))
 				.withFriends(friendRepository.findFriendsByUserId(user.getId()))
 				.withProducts(productRepository.findProductsByUserId(user.getId()))
@@ -145,5 +138,24 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		
 		
 		return findUsers;
+	}
+	
+	public int deleteByEmail(String email) {
+		String query = "DELETE FROM users WHERE email = ?";
+		int deleteRow = jdbcTemplate.update(query, email);
+		
+		if(deleteRow == 0) throw new InsertSQLException("erreur suppression randomText");		
+		return deleteRow;
+	}
+
+	@Override
+	public int updateUserByUserId(UserEntity user) {
+		String query = "UPDATE users SET is_account_created=:isAccountCreated, updated_at=:updatedAt WHERE id = :id";
+		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(user);
+		int updatedRow = namedParameterJdbcTemplate.update(query, sqlParam);
+		
+		if(updatedRow == 0) throw new InsertSQLException("probleme update user");
+		
+		return updatedRow;
 	}
 }
