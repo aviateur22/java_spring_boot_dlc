@@ -76,6 +76,7 @@ public class HtmlTemplateService {
 	}
 	
 	private String getHtmlTemplate(String filePath, Map<String, String> replaceWords) throws IOException {
+		System.out.println(replaceWords);
 		InputStream fileStream = new ClassPathResource(filePath).getInputStream();		
 		String content = this.readFromInputStream(fileStream);
 		

@@ -1,5 +1,6 @@
 package com.ctoutweb.dlc.service;
 
+import com.ctoutweb.dlc.model.auth.LogoutResponse;
 import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
@@ -8,11 +9,14 @@ import com.ctoutweb.dlc.repository.UserRepository;
 
 @Service
 public class UserService {
-	private final UserRepository userRepository;	
+	private final UserRepository userRepository;
 
-	public UserService(UserRepository userRepository) {
+	private final TokenService tokenService;
+
+	public UserService(UserRepository userRepository, TokenService tokenService) {
 		super();
 		this.userRepository = userRepository;
+		this.tokenService = tokenService;
 	}
 
 

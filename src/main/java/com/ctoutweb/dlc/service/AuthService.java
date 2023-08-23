@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -96,15 +97,13 @@ public class AuthService {
 	
 	public RegisterEmailResponse registerEmail(RegisterEmailRequest request) {
 		try {
-			// Vérifier que les données atttendu sont présentes
-			
 			// Vérifier si selection image utilisateur correcte 
 			if(!randomImageService.isUserImageSelectionValid(request.getRegisterId(), request.getRegisterRandomText(), request.getSelectedImageRandomWords())) throw new RuntimeException("selection image invalide");
 			
 			// si ok: vérifier l'existrence de l'email en base de données
 			userRepository.findUserByEmail(request.getEmail()).ifPresent(user->{
-				// On valide un email utilisé uniquement si le compte n'est pas créé
-				if(user.getIsAccountCreated()) throw new UserFindException("cet email est déja utilisé");
+				// On valide un email utilisé uniquement si le compte n'est pas créé ou
+				if(user.getIsAccountCreated() && user.getAccount().getMaximumAccountActivationDate().compareTo(new Date()) > 0) throw new UserFindException("cet email est déja utilisé");
 				
 				// Suppression de l'ancien email
 				userRepository.deleteByEmail(request.getEmail());
@@ -140,7 +139,7 @@ public class AuthService {
 			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
 			listWordsToReplaceInHtmlTemplate.put("token", randomString);
 			listWordsToReplaceInHtmlTemplate.put("email", request.getEmail());
-			listWordsToReplaceInHtmlTemplate.put("link", "auth/create-account/user/"+ request.getEmail() + "/confirmation/" + emailConfirmationString.getEncryptRandomWord());
+			listWordsToReplaceInHtmlTemplate.put("link", "http://localhost:4200/auth/create-account/user/"+ request.getEmail() + "/confirmation/" + emailConfirmationString.getEncryptRandomWord());
 			
 			// envoyer un l'email
 			mailService.sendEmail(RegisterMailing.builder()
@@ -232,7 +231,7 @@ public class AuthService {
 			
 			Map <String, String> listWordsToReplaceInHtmlTemplate = new HashMap<>();			
 			listWordsToReplaceInHtmlTemplate.put("email", user.getEmail());
-			listWordsToReplaceInHtmlTemplate.put("link", "auth/activate-account/user/"+ user.getEmail() + "/confirmation/" + activationAccountToken.getEncryptRandomWord());
+			listWordsToReplaceInHtmlTemplate.put("link", "http://localhost:4200/auth/account-activation/user/"+ user.getEmail() + "/confirmation/" + activationAccountToken.getEncryptRandomWord());
 			
 			//Envoi d'un email d'activation de compte		
 			mailService.sendEmail(RegisterMailing.builder()
@@ -266,11 +265,11 @@ public class AuthService {
 		try {
 		// récupérer les infos sur l'utilisateur en bdd (token email + token registerurl)
 		user = userRepository.findUserByEmail(request.getEmail()).orElseThrow(()->new ActivateAccountException("impossible d'activer votre compte"));
-			
+
 		if(user.getAccount() == null) throw new ActivateAccountException("impossible d'activer votre compte");
-		
-		if(user.getAccount() != null  && user.getAccount().getIsAccountActive()) throw new ActivateAccountException("votre compte est déja activé"); 
-		
+
+		if(user.getAccount() != null  && user.getAccount().getIsAccountActive()) throw new ActivateAccountException("votre compte est déja activé");
+
 		// Récupération des randomTexts
 		List<RandomConfirmationToken> userRandomConfirmationTokens = user.getRandomConfirmationTokens();
 		
@@ -302,7 +301,7 @@ public class AuthService {
 			e.printStackTrace();			
 			throw new EncryptionException("le code de confirmation n'est pas correcte");
 		} catch(RuntimeException ex) {
-			ex.printStackTrace();			
+			ex.printStackTrace();
 			throw new ActivateAccountException(ex.getMessage());
 		}		
 	}
@@ -316,14 +315,19 @@ public class AuthService {
 		TokenIssue tokenIssue = jwtIssuer.issue(userPrincipal);		
 		tokenService.saveToken(userPrincipal.getId(), tokenIssue);
 		
-		return new LoginResponse(tokenIssue.getToken());
+		return new LoginResponse.LoginResponseBuilder()
+				.withMessage("bonjour " + request.getEmail())
+				.withToken(tokenIssue.getToken())
+				.withRoles(userPrincipal.getAuthorities().stream().map(x->x.getAuthority().toString()).collect(Collectors.toList()))
+				.withEmail(request.getEmail())
+				.withId(userPrincipal.getId())
+				.build();
 	}
-	
 	public LogoutResponse logout(int userId) {
 		tokenService.deleteToken(userId);
 		return LogoutResponse.builder().withMessage("à bientôt").build();
 	}
-	
+
 	private void verifyClientTokenHelper(VerifyClientToken verifyClientToken) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException {
 		// vérifier le 'encryptedRandomURLToken			
 		RandomConfirmationToken tokenFromDatabase = verifyClientToken.getUserRandomConfirmationTokens()
@@ -334,7 +338,7 @@ public class AuthService {
 		
 		verifyClientToken.setTokenFromDatabase(tokenFromDatabase);
 		// Vérifier expiredAt
-		if(tokenFromDatabase.getExpiredAt().compareTo(new Date()) < 0) throw new CreateAccountException(verifyClientToken.getExceptionMessage());
+		if(tokenFromDatabase.getExpiredAt().compareTo(new Date()) < 0) throw new TokenException("temps d'activation dépassé, merci de vous réinscrire");
 		
 		//Vérification urlToken  avec le code présent en base de donnée
 		if(verifyClientToken.getIsTokenEncrypted()) {

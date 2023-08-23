@@ -12,6 +12,7 @@ public interface ProductRepository {
 	List<Product> findProductsByUserId(int userId);
 	List<Product> findProductsByUserOwnerId(int userId);
 	Optional<ProductEntity> findProductById(int productId);
+	Optional<Product> findProductByUserIdAndProductId(int userId, int productId);
 	int saveProduct(ProductEntity product, List<Friend> friends);
 	int deleteProduct(int productId);
 }

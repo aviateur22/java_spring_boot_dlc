@@ -44,9 +44,8 @@ public class TokenService {
 		if(!findToken.getIsValid()) new TokenException("ce token n'est pas valide");
 	}
 	
-	public void deleteToken(int userId) {		
-		System.out.println("ic");
-		tokenRepository.findTokenByUserId(userId).ifPresentOrElse((findToken)->tokenRepository.deleteTokenByUserId(userId), null);		
+	public void deleteToken(int userId) {
+		tokenRepository.findTokenByUserId(userId).ifPresent((findToken)->tokenRepository.deleteTokenByUserId(userId));
 	}
 
 }

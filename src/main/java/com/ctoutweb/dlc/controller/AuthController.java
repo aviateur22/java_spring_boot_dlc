@@ -1,13 +1,11 @@
 package com.ctoutweb.dlc.controller;
 
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.ctoutweb.dlc.annotation.AnnotationValidator;
 import com.ctoutweb.dlc.model.auth.ActivateAccountRequest;
@@ -21,9 +19,9 @@ import com.ctoutweb.dlc.model.auth.RegisterEmailRequest;
 import com.ctoutweb.dlc.model.auth.RegisterEmailResponse;
 import com.ctoutweb.dlc.security.authentication.UserPrincipal;
 import com.ctoutweb.dlc.service.AuthService;
-
+@Validated
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/dlc/auth")
 public class AuthController {
 	
 	private final AuthService authService;	
@@ -37,9 +35,9 @@ public class AuthController {
 			AnnotationValidator<CreateAccountRequest> annotationValidtorCreateAccount, 
 			AnnotationValidator<LoginRequest> annotationValidtorLogin, 
 			AnnotationValidator<RegisterEmailRequest> annotationValidatorRegisterEmail,
-			AnnotationValidator<ActivateAccountRequest> annotationValidtorActivateAccount		
+			AnnotationValidator<ActivateAccountRequest> annotationValidtorActivateAccount
 			) {
-		super();
+		//super();
 		this.authService = authService;
 		this.annotationValidatorRegisterEmail = annotationValidatorRegisterEmail;		
 		this.annotationValidtorCreateAccount = annotationValidtorCreateAccount;
@@ -63,6 +61,7 @@ public class AuthController {
 	
 	@PostMapping("/create-account")
 	public ResponseEntity<CreateAccountResponse> createAccount(@RequestBody CreateAccountRequest request){
+
 		annotationValidtorCreateAccount.validate(request);
 		
 		CreateAccountResponse response = authService.createAccount(request);
@@ -75,11 +74,10 @@ public class AuthController {
 		ActivateAccountResponse response = authService.accountActivation(request);
 		return new ResponseEntity<ActivateAccountResponse>(response, HttpStatus.OK);
 	}
-	
-	@GetMapping("/logout")
-	public ResponseEntity<LogoutResponse> logout(@AuthenticationPrincipal UserPrincipal user){		
-		LogoutResponse response = authService.logout(user.getId());
+
+	@GetMapping("/logout/user/{id}")
+	public ResponseEntity<LogoutResponse> logout(@PathVariable("id") @Min(value = 1, message = "id utililisateur manquant") int id){
+		LogoutResponse response = authService.logout(id);
 		return new ResponseEntity<LogoutResponse>(response, HttpStatus.OK);
 	}
-
 }

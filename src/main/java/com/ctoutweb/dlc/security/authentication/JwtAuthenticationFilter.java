@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.ctoutweb.dlc.security.token.JwtDecoder;
 import com.ctoutweb.dlc.security.token.JwtToUserPrincipalConverter;
 import com.ctoutweb.dlc.service.TokenService;
@@ -34,17 +35,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException{
-		extractTokenFromHeaders(request)		
-		.map(token->jwtDecoder.decode(token))
-		.map(decodeJwt->jwtToUserPrincipal.convert(decodeJwt))		
-		.map(userPrincipal->new UserPrincipalAutenticationToken(userPrincipal))		
-		.ifPresent(auth->{
-			SecurityContextHolder.getContext().setAuthentication(auth);
-			this.validateJwt(request);
-		});
 		
+		try {
+			extractTokenFromHeaders(request)		
+			.map(token->jwtDecoder.decode(token))
+			.map(decodeJwt->jwtToUserPrincipal.convert(decodeJwt))		
+			.map(userPrincipal->new UserPrincipalAutenticationToken(userPrincipal))		
+			.ifPresent(auth->{
+				SecurityContextHolder.getContext().setAuthentication(auth);
+				this.validateJwt(request);
+			});
+			
+			filterChain.doFilter(request, response);
+		} catch (TokenExpiredException e) {
+			e.printStackTrace();
+			throw new TokenExpiredException("super", null);
+			
+		}
 		
-		filterChain.doFilter(request, response);
 		
 	}
 	
@@ -56,11 +64,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	private Optional<String> extractTokenFromHeaders(HttpServletRequest request) {
 		var token = request.getHeader("authorization");
-		
 		if(!StringUtils.hasText(token) || !token.startsWith("Bearer ")) return Optional.empty();
-		
+
 		return Optional.of(token.substring(7));
-		
 	}
 
 }

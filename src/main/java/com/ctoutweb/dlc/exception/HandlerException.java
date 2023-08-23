@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,8 @@ import com.ctoutweb.dlc.exception.custom.InsertSQLException;
 import com.ctoutweb.dlc.exception.custom.TokenException;
 import com.ctoutweb.dlc.exception.custom.UserFindException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.www.NonceExpiredException;
+
 import com.ctoutweb.dlc.model.ErrorResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -126,7 +129,8 @@ public class HandlerException {
 		System.out.println(ex.getMessage());
 		System.out.println(ex);
 		ex.printStackTrace();
-		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoir pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
+		if(ex instanceof NonceExpiredException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("nonce"), HttpStatusCode.valueOf(403));
+		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoire pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
 		
 		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
 		ex.printStackTrace();
@@ -148,6 +152,12 @@ public class HandlerException {
 	@ExceptionHandler(value = {ActivateAccountException.class})
 	public ResponseEntity<ErrorResponse> activateAccountException(ActivateAccountException ex, WebRequest request){	
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}	
+	
+	@ExceptionHandler(value= {DisabledException.class})
+	public ResponseEntity<ErrorResponse> disabledException(DisabledException ex, WebRequest request) {
+		ErrorResponse error = new ErrorResponse("activation de votre compte obligatoire");
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	

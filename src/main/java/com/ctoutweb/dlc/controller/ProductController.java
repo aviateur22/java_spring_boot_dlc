@@ -1,5 +1,6 @@
 package com.ctoutweb.dlc.controller;
 
+import com.ctoutweb.dlc.model.Product;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ import jakarta.validation.constraints.Positive;
 
 @Validated
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/v1/dlc/products")
 public class ProductController {
 	
 	private final ProductService productService;
@@ -39,12 +40,27 @@ public class ProductController {
 	}
 
 
-	@PostMapping("/")
+	@PostMapping("")
 	public ResponseEntity<SaveProductResponse> saveProduct(@ModelAttribute SaveProductRequest request, @AuthenticationPrincipal UserPrincipal user) {		
 		annotationValidatorSaveProduct.validate(request);
-		
+		System.out.println(request.getProductEndDate());
 		SaveProductResponse response =  productService.saveProduct(request, user.getId());
 		return new ResponseEntity<SaveProductResponse>(response, HttpStatus.CREATED);
+	}
+
+	@GetMapping("/{productId}/user/{userId}")
+	public ResponseEntity<Product> findProductByUserIdAndProductId(@PathVariable("productId")
+	@NotNull (message = "l'identifiant du produit est obligatoire")
+	@Positive (message = "l'identifiant du produit est obligatoire")
+	@Min( value = 1, message = "l'identifiant du produit est obligatoire")
+	int productId,
+																   @PathVariable("userId")
+	@NotNull (message = "l'identifiant de l'utilisateur est obligatoire")
+	@Positive (message = "l'identifiant de l'utilisateur est obligatoire")
+	@Min( value = 1, message = "l'identifiant de l'utilisateur est obligatoire")
+	int userId) {
+		Product product = productService.findProductByUserAndProductId(userId, productId);
+		return new ResponseEntity<>(product, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/{id}")

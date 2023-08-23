@@ -84,7 +84,7 @@ public class Account {
 	/**
 	 * @param isAccountActive the isAccountActive to set
 	 */
-	public void setAccountActive(boolean isAccountActive) {
+	public void setIsAccountActive(boolean isAccountActive) {
 		this.isAccountActive = isAccountActive;
 	}
 	/**

@@ -122,4 +122,38 @@ public class ProductRepositoryImp extends IdKeyHolder implements ProductReposito
 			return Optional.empty();
 		}	
 	}
+
+	public Optional<Product> findProductByUserIdAndProductId(int userId, int productId){
+		try {
+			String query = "SELECT " +
+					"product_user.product_id," +
+					"product_user.user_id," +
+					"products.file_name,"+
+					"products.path,"+
+					"products.product_open_date," +
+					"products.product_end_date," +
+					"products.created_at " +
+					"FROM product_user " +
+					"JOIN products ON product_user.product_id = products.id " +
+					"WHERE product_user.user_id= ? AND product_user.product_id = ? " +
+					"LIMIT 1";
+
+
+			Product product = jdbcTemplate.queryForObject(query,
+					(rs, rowNum)->Product.builder()
+							.withId(rs.getInt("product_id"))
+							.withUserId(rs.getInt("user_id"))
+							.withFileName(rs.getString("file_name"))
+							.withPath(rs.getString("path"))
+							.withProductOpenDate(rs.getTimestamp("product_open_date"))
+							.withProductEndDate(rs.getTimestamp("product_end_date"))
+							.withCreatedAt(rs.getTimestamp("created_at"))
+							.build()
+					, userId, productId);
+			return Optional.of(product);
+
+		} catch (IncorrectResultSizeDataAccessException e) {
+			return Optional.empty();
+		}
+	}
 }

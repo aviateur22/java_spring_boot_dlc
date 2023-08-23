@@ -1,8 +1,13 @@
 package com.ctoutweb.dlc.model.product;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
+import com.ctoutweb.dlc.annotation.date.DateFormat;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ctoutweb.dlc.annotation.file.FileExtension;
@@ -19,9 +24,11 @@ public class SaveProductRequest {
 	private MultipartFile file;
 	
 	@NotNull(message="la date d'ouverture est obligatoire")
+	@DateFormat(message = "le format de la date d'ouverture n'est pas correcte")
 	private Date productOpenDate;
 	
 	@NotNull(message = "la dlc est obligatoire")
+	@DateFormat(message = "le format de la dlc n'est pas correcte")
 	private Date productEndDate;
 	/**
 	 * @return the file

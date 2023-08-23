@@ -15,6 +15,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.ctoutweb.dlc.security.authentication.JwtAuthenticationFilter;
 import com.ctoutweb.dlc.security.authentication.UserPrincipalDetailService;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -40,19 +45,29 @@ public class WebSecurity {
 		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		http
+			.cors(cors->corsConfigurationSource())
 			.csrf(csrf->csrf.disable())
 			.exceptionHandling(exception->exception.authenticationEntryPoint(authenticationEntryPoint))
 			.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(login->login.disable())
 			.authorizeHttpRequests(httpRequest->httpRequest
-					.requestMatchers("/api/v1/auth/**").permitAll()
-					.requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+					.requestMatchers("/api/v1/dlc/auth/**").permitAll()
+					.requestMatchers("/api/v1/dlc/admin/**").hasRole("ADMIN")
 					.anyRequest().authenticated());
 			
 		return http.build();
 	}
-	
 
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:4400"));
+		configuration.setAllowedMethods(Arrays.asList("POST", "GET"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 	@Bean
 	PasswordEncoder passwordEncode() {
 		return new BCryptPasswordEncoder();
