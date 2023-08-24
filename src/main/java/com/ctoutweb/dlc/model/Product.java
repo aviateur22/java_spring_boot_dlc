@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Product {
-	private int id;
+	private int productId;
 	private int userId;
 	private String path;
 	private String fileName;
@@ -12,31 +12,35 @@ public class Product {
 	private Date productEndDate;
 	private Date productOpenDate;
 	private Date createdAt;
+	private long numberOfOpenDays;
+	private long numberOfDayLeftBeforeExpired;
 
 	public Product(Builder builder) {
-		this.id = builder.id;
+		this.productId = builder.productId;
 		this.userId = builder.userId;
 		this.path = builder.path;
 		this.fileName = builder.fileName;
 		this.imageBase64 = builder.imageBase64;
 		this.productEndDate = builder.productEndDate;
 		this.productOpenDate = builder.productOpenDate;
-		this.createdAt = builder.createdAt;		
+		this.createdAt = builder.createdAt;
+		this.numberOfOpenDays = builder.numberOfOpenDays;
+		this.numberOfDayLeftBeforeExpired = builder.numberOfDayLeftBeforeExpired;
 	}
 	
 	
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return id;
+	public int getProductId() {
+		return productId;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param productId the productId to set
 	 */
-	public void setId(int id) {
-		this.id = id;
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
 
 	public int getUserId() {
@@ -107,6 +111,20 @@ public class Product {
 		this.productOpenDate = productOpenDate;
 	}
 
+	public long getNumberOfOpenDays() {
+		return numberOfOpenDays;
+	}
+	public void setNumberOfOpenDays(long numberOfOpenDays) {
+		this.numberOfOpenDays = numberOfOpenDays;
+	}
+
+	public long getNumberOfDayLeftBeforeExpired() {
+		return numberOfDayLeftBeforeExpired;
+	}
+
+	public void setNumberOfDayLeftBeforeExpired(long numberOfDayLeftBeforeExpired) {
+		this.numberOfDayLeftBeforeExpired = numberOfDayLeftBeforeExpired;
+	}
 	/**
 	 * @return the createdAt
 	 */
@@ -123,7 +141,7 @@ public class Product {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, id, path, productEndDate, productOpenDate);
+		return Objects.hash(createdAt, productId, path, productEndDate, productOpenDate);
 	}
 
 	@Override
@@ -135,14 +153,14 @@ public class Product {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		return Objects.equals(createdAt, other.createdAt) && id == other.id && Objects.equals(path, other.path)
+		return Objects.equals(createdAt, other.createdAt) && productId == other.productId && Objects.equals(path, other.path)
 				&& Objects.equals(productEndDate, other.productEndDate)
 				&& Objects.equals(productOpenDate, other.productOpenDate);
 	}
 
 	@Override
 	public String toString() {
-		return "Product [id=" + id + ", path=" + path + ", productEndDate=" + productEndDate + ", productOpenDate="
+		return "Product [id=" + productId + ", path=" + path + ", productEndDate=" + productEndDate + ", productOpenDate="
 				+ productOpenDate + ", createdAt=" + createdAt + "]";
 	}
 
@@ -156,20 +174,22 @@ public class Product {
 	
 	
 	public static final class Builder {
-		private int id;
+		private int productId;
 		private int userId;
 		private String path;
 		private String fileName;
 		private String imageBase64;
 		private Date productEndDate;
 		private Date productOpenDate;
-		private Date createdAt;		
+		private Date createdAt;
+		private long numberOfOpenDays;
+		private long numberOfDayLeftBeforeExpired;
 
 		private Builder() {
 		}
 
-		public Builder withId(int id) {
-			this.id = id;
+		public Builder withProductId(int productId) {
+			this.productId = productId;
 			return this;
 		}
 		
@@ -205,6 +225,16 @@ public class Product {
 
 		public Builder withCreatedAt(Date createdAt) {
 			this.createdAt = createdAt;
+			return this;
+		}
+
+		public Builder withNumberOfOpenDays(long numberOfOpenDays) {
+			this.numberOfOpenDays = numberOfOpenDays;
+			return this;
+		}
+
+		public Builder withNumberOfDayLeftBeforeExpired(long numberOfDayLeftBeforeExpired) {
+			this.numberOfDayLeftBeforeExpired = numberOfDayLeftBeforeExpired;
 			return this;
 		}
 		

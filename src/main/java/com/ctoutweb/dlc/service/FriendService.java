@@ -166,7 +166,7 @@ public class FriendService {
 				.stream()
 				.map(product-> ProductUserEntity.builder()
 						.withCreatedAt(Timestamp.from(createdAt))
-						.withProductId(product.getId())
+						.withProductId(product.getProductId())
 						.withUserId(friendId)						
 						.build())
 				.collect(Collectors.toList());

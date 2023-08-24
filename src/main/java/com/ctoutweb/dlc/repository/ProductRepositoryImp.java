@@ -51,7 +51,7 @@ public class ProductRepositoryImp extends IdKeyHolder implements ProductReposito
 		
 		return namedParamJdbcTemplate.query(query, sqlParam, 
 				(rs, rowNum)->Product.builder()
-					.withId(rs.getInt("id"))
+					.withProductId(rs.getInt("id"))
 					.withUserId(rs.getInt("user_id"))
 					.withFileName(rs.getString("file_name"))
 					.withImageBase64(storageService.getImageInBase64Format(rs.getString("file_name")))
@@ -60,8 +60,6 @@ public class ProductRepositoryImp extends IdKeyHolder implements ProductReposito
 					.withProductOpenDate(rs.getTimestamp("product_open_date"))					
 					.withProductEndDate(rs.getTimestamp("product_end_date"))
 					.build());
-		//return namedParamJdbcTemplate.query(query, sqlParam, BeanPropertyRowMapper.newInstance(Product.class));
-		
 	}
 
 	@Override
@@ -141,7 +139,7 @@ public class ProductRepositoryImp extends IdKeyHolder implements ProductReposito
 
 			Product product = jdbcTemplate.queryForObject(query,
 					(rs, rowNum)->Product.builder()
-							.withId(rs.getInt("product_id"))
+							.withProductId(rs.getInt("product_id"))
 							.withUserId(rs.getInt("user_id"))
 							.withFileName(rs.getString("file_name"))
 							.withPath(rs.getString("path"))

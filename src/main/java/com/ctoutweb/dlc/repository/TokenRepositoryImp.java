@@ -64,7 +64,7 @@ public class TokenRepositoryImp extends IdKeyHolder implements TokenRepository {
 	public int updateToken(TokenEntity token) {
 		Instant updatedAt = Instant.now();
 		token.setUpdatedAt(Timestamp.from(updatedAt));
-		System.out.println(token);
+
 		String query = "UPDATE tokens "
 				+ "SET "				
 				+ "token = :token, "

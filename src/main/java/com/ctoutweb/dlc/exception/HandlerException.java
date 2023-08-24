@@ -2,6 +2,7 @@
 
 import java.nio.file.FileAlreadyExistsException;
 
+import com.ctoutweb.dlc.exception.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -16,19 +17,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.ctoutweb.dlc.exception.custom.ActivateAccountException;
-import com.ctoutweb.dlc.exception.custom.AnnotationException;
-import com.ctoutweb.dlc.exception.custom.CreateAccountException;
-import com.ctoutweb.dlc.exception.custom.EmailException;
-import com.ctoutweb.dlc.exception.custom.EncryptionException;
-import com.ctoutweb.dlc.exception.custom.FileException;
-import com.ctoutweb.dlc.exception.custom.FriendNotFindException;
-import com.ctoutweb.dlc.exception.custom.InsertSQLException;
-import com.ctoutweb.dlc.exception.custom.TokenException;
-import com.ctoutweb.dlc.exception.custom.UserFindException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.NonceExpiredException;
 
@@ -125,9 +115,7 @@ public class HandlerException {
 	}
 	
 	@ExceptionHandler(value = {AuthenticationException.class})
-	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){	
-		System.out.println(ex.getMessage());
-		System.out.println(ex);
+	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){
 		ex.printStackTrace();
 		if(ex instanceof NonceExpiredException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("nonce"), HttpStatusCode.valueOf(403));
 		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoire pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
@@ -166,6 +154,10 @@ public class HandlerException {
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
-	
+	@ExceptionHandler(value = {ProductNotFindException.class})
+	public ResponseEntity<ErrorResponse> productNotFindException(ProductNotFindException ex, WebRequest request) {
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.NOT_FOUND);
+	}
 	
 }

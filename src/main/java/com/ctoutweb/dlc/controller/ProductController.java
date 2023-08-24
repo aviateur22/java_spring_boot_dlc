@@ -24,6 +24,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Validated
 @RestController
 @RequestMapping("/api/v1/dlc/products")
@@ -43,7 +46,6 @@ public class ProductController {
 	@PostMapping("")
 	public ResponseEntity<SaveProductResponse> saveProduct(@ModelAttribute SaveProductRequest request, @AuthenticationPrincipal UserPrincipal user) {		
 		annotationValidatorSaveProduct.validate(request);
-		System.out.println(request.getProductEndDate());
 		SaveProductResponse response =  productService.saveProduct(request, user.getId());
 		return new ResponseEntity<SaveProductResponse>(response, HttpStatus.CREATED);
 	}
@@ -62,7 +64,17 @@ public class ProductController {
 		Product product = productService.findProductByUserAndProductId(userId, productId);
 		return new ResponseEntity<>(product, HttpStatus.OK);
 	}
-	
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Product>> findProductsByUserId(@PathVariable("userId")
+    @NotNull(message = "l'identifiant de l'utilisateur est obligatoire")
+    @Positive (message = "l'identifiant de l'utilisateur est obligatoire")
+    @Min(value = 1, message = "l'identifiant de l'utilisateur est obligatoire")
+    int userId){
+        List<Product> userProducts = this.productService.findProductsByUserId(userId);
+        return new ResponseEntity<>(userProducts, HttpStatus.OK);
+    }
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<DeleteProductResponse> deleteProduct(@PathVariable("id")
 	@NotNull (message = "l'identifiant du produit est obligatoire")
