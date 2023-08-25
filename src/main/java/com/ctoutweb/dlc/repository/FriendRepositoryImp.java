@@ -48,7 +48,7 @@ public class FriendRepositoryImp extends IdKeyHolder implements FriendsRepositor
 		
 		String query = "SELECT "
 				+ "f.id, f.friend_id, f.nickname, f.is_friend_request_new, f.is_friend_request_accepted, f.is_relation_accepted, "
-				+ "f.created_at AS friendCreatedAt, u.email, u.created_at "
+				+ "f.created_at AS friendCreatedAt, f.is_relation_deleted, u.email, u.created_at "
 				+ "FROM friends AS f "
 				+ "JOIN users AS u "
 				+ "ON f.friend_id = u.id "
@@ -88,10 +88,7 @@ public class FriendRepositoryImp extends IdKeyHolder implements FriendsRepositor
 		
 		// Mise a jour de la relation ami du suppresseur 
 		this.updateFriend(friendOfDeleter);
-		
-		
-		
-		
+
 		return 0;
 	}
 

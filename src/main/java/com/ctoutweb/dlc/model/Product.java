@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Product {
-	private int productId;
+	private int id;
 	private int userId;
 	private String path;
 	private String fileName;
@@ -16,7 +16,7 @@ public class Product {
 	private long numberOfDayLeftBeforeExpired;
 
 	public Product(Builder builder) {
-		this.productId = builder.productId;
+		this.id = builder.id;
 		this.userId = builder.userId;
 		this.path = builder.path;
 		this.fileName = builder.fileName;
@@ -32,15 +32,15 @@ public class Product {
 	/**
 	 * @return the id
 	 */
-	public int getProductId() {
-		return productId;
+	public int getId() {
+		return id;
 	}
 
 	/**
-	 * @param productId the productId to set
+	 * @param id the productId to set
 	 */
-	public void setProductId(int productId) {
-		this.productId = productId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public int getUserId() {
@@ -141,7 +141,7 @@ public class Product {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, productId, path, productEndDate, productOpenDate);
+		return Objects.hash(createdAt, id, path, productEndDate, productOpenDate);
 	}
 
 	@Override
@@ -153,14 +153,14 @@ public class Product {
 		if (getClass() != obj.getClass())
 			return false;
 		Product other = (Product) obj;
-		return Objects.equals(createdAt, other.createdAt) && productId == other.productId && Objects.equals(path, other.path)
+		return Objects.equals(createdAt, other.createdAt) && id == other.id && Objects.equals(path, other.path)
 				&& Objects.equals(productEndDate, other.productEndDate)
 				&& Objects.equals(productOpenDate, other.productOpenDate);
 	}
 
 	@Override
 	public String toString() {
-		return "Product [id=" + productId + ", path=" + path + ", productEndDate=" + productEndDate + ", productOpenDate="
+		return "Product [id=" + id + ", path=" + path + ", productEndDate=" + productEndDate + ", productOpenDate="
 				+ productOpenDate + ", createdAt=" + createdAt + "]";
 	}
 
@@ -174,7 +174,7 @@ public class Product {
 	
 	
 	public static final class Builder {
-		private int productId;
+		private int id;
 		private int userId;
 		private String path;
 		private String fileName;
@@ -188,8 +188,8 @@ public class Product {
 		private Builder() {
 		}
 
-		public Builder withProductId(int productId) {
-			this.productId = productId;
+		public Builder withProductId(int id) {
+			this.id = id;
 			return this;
 		}
 		

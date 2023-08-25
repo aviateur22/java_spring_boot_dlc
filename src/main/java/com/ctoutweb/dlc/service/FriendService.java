@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ctoutweb.dlc.model.friend.*;
 import org.springframework.stereotype.Service;
 
 import com.ctoutweb.dlc.entity.FriendEntity;
@@ -14,11 +15,6 @@ import com.ctoutweb.dlc.exception.custom.UserFindException;
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.ctoutweb.dlc.model.Friend;
 import com.ctoutweb.dlc.model.User;
-import com.ctoutweb.dlc.model.friend.AddFriendRequest;
-import com.ctoutweb.dlc.model.friend.AddFriendResponse;
-import com.ctoutweb.dlc.model.friend.DeleteFriendResponse;
-import com.ctoutweb.dlc.model.friend.UpdateFriendResponse;
-import com.ctoutweb.dlc.model.friend.UpdateFriendRelationRequest;
 import com.ctoutweb.dlc.repository.FriendsRepository;
 import com.ctoutweb.dlc.repository.ProductRepository;
 import com.ctoutweb.dlc.repository.ProductUserRepository;
@@ -119,7 +115,10 @@ public class FriendService {
 		friendRepository.updateFriend(userUpdater);
 		friendRepository.updateFriend(friendOfUpdater);
 		
-		if(isFriendRelationAccepted) this.addProductToFriend(request.getFriendId(), userId);		
+		if(isFriendRelationAccepted){
+			this.addProductToFriend(request.getFriendId(), userId);
+			this.addProductToFriend(userId, request.getFriendId());
+		}
 		
 		String message = isFriendRelationAccepted == true ? 
 					"la relation avec " + updaterFriend.getEmail() + " est validée" 
@@ -155,19 +154,19 @@ public class FriendService {
 			.build();				
 	}
 	
-	public List<Friend> findFriendsByUserId(int userId){		
-		return friendRepository.findFriendsByUserId(userId);
+	public FindFriendsByUserIdResponse findFriendsByUserId(int userId){
+		List<Friend> friends = friendRepository.findFriendsByUserId(userId);
+		return FindFriendsByUserIdResponse.FindFriendsByUserIdResponseBuilder.aFindFriendsByUserIdResponse().withFriends(friends).build();
 	}
 	
 	private void addProductToFriend(int ownerId, int friendId) {
 		Instant createdAt = Instant.now();
-		
 		List<ProductUserEntity> userProducts = productRepository.findProductsByUserOwnerId(ownerId)
 				.stream()
 				.map(product-> ProductUserEntity.builder()
 						.withCreatedAt(Timestamp.from(createdAt))
-						.withProductId(product.getProductId())
-						.withUserId(friendId)						
+						.withProductId(product.getId())
+						.withUserId(friendId)
 						.build())
 				.collect(Collectors.toList());
 		

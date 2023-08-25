@@ -37,7 +37,7 @@ public class ProductUserRepositoryImp extends IdKeyHolder implements ProductUser
 	@Override
 	@Transactional
 	public void addProductsToFriends(List<ProductUserEntity> productsUsers) {
-		
+		System.out.println(productsUsers);
 		String query = "INSERT INTO product_user "
 				+ "(user_id, product_id, created_at) "
 				+ "VALUES "
