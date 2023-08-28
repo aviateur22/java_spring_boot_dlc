@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+spring.mvc.format.date: yyyy-MM-dd
+spring.mvc.format.date-time: yyyy-MM-dd HH:mm:ss
+spring.mvc.format.time: HH:mm:ss
+
+spring.servlet.multipart.max-file-size: 10MB
+spring.servlet.multipart.max-request-size: 10MB
+
+logging.level.org.springframework.web: DEBUG
+
+jwt.secret-key: ${JWT_SECRET}
+jwt.issuer: ctoutweb
+
+email.username: ${EMAIL_USERNAME}
+email.password: ${EMAIL_PASSWORD}
+email.port: ${EMAIL_PORT}
+email.host: ${EMAIL_HOST}
+email.smtp-auth: true
+email.smtp-starttls-enable: true
+
+aes.key: ${AES_KEY}
+aes.salt: ${AES_SALT}

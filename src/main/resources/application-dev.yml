@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dlc
+    username: admin
+    password: admin
+
+spring.mvc.format.date: yyyy-MM-dd
+spring.mvc.format.date-time: yyyy-MM-dd HH:mm:ss
+spring.mvc.format.time: HH:mm:ss
+
+spring.servlet.multipart.max-file-size: 10MB
+spring.servlet.multipart.max-request-size: 10MB
+
+logging.level.org.springframework.web: DEBUG
+
+jwt.secret-key: jfldsjflmkdsflmdfhpidhfpdjfdsf*ôpeepîr^r454354343qdsqdqdd44254
+jwt.issuer: ctoutweb
+
+email.username: admin@ctoutweb.fr
+email.password: affirmer2011
+email.port: 587
+email.host: mail.gandi.net
+email.smtp-auth: true
+email.smtp-starttls-enable: true
+
+aes.key: hjdfjkdhldhljdfldmùmddùPQdùmslqdf,msqnflnfclqdsfldqjfcbdqcnlfdqmfmsfùmsqdjmjffcsqfjqsdjqsqsm
+aes.salt: 8E2EDB261622042C4BA537F970B842A22C48836BFBC9BEC8756DB400A41E41EAE2F628DE3F1F0A690AA57705CE62C5E9BCED67C8D5C22C17D735D0C137D7CC81
