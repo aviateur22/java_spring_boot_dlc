@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.ctoutweb.dlc.exception.custom.ProductException;
 import com.ctoutweb.dlc.exception.custom.ProductNotFindException;
 import com.ctoutweb.dlc.helper.DateHelper;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,10 @@ public class ProductService {
 	}
 
 	public SaveProductResponse saveProduct(SaveProductRequest productRequest, int userId) {
-				
+
+		if(productRequest.getProductOpenDate().getTime() > productRequest.getProductEndDate().getTime()) {
+			throw new ProductException("la date de DLC ne peut pas être inférieur à la date d'ouverture");
+		}
 		ProductEntity product = storageService.saveFile(productRequest, userId);
 		List<Friend> friends = friendRepository.findFriendByUserIdWithRelationAccepted(userId)
 				.stream()				
@@ -74,8 +78,8 @@ public class ProductService {
         .stream()
         .forEach(product->{
 			product.setImageBase64(storageService.getImageInBase64Format(product.getFileName()));
-			product.setNumberOfOpenDays(Math.abs(this.dateHelper.getNumberOfDay(product.getProductOpenDate(), new Date(), TimeUnit.DAYS)));
-			product.setNumberOfDayLeftBeforeExpired(Math.abs(this.dateHelper.getNumberOfDay(product.getProductEndDate(), new Date(), TimeUnit.DAYS)));
+			product.setNumberOfOpenDays(Math.abs(this.dateHelper.getNumberOfDay(product.getProductOpenDate(), TimeUnit.DAYS,true)));
+			product.setNumberOfDayLeftBeforeExpired(this.dateHelper.getNumberOfDay(product.getProductEndDate(), TimeUnit.DAYS, false));
 		});
 
 		return products;
@@ -85,8 +89,8 @@ public class ProductService {
 		Product product = this.productRepository.findProductByUserIdAndProductId(userId, productId).orElseThrow(
 				()->new ProductNotFindException("le produit n'est pas trouvé"));
 		product.setImageBase64(storageService.getImageInBase64Format(product.getFileName()));
-		product.setNumberOfOpenDays(Math.abs(this.dateHelper.getNumberOfDay(product.getProductOpenDate(), new Date(), TimeUnit.DAYS)));
-		product.setNumberOfDayLeftBeforeExpired(Math.abs(this.dateHelper.getNumberOfDay(product.getProductEndDate(), new Date(), TimeUnit.DAYS)));
+		product.setNumberOfOpenDays(Math.abs(this.dateHelper.getNumberOfDay(product.getProductOpenDate(), TimeUnit.DAYS,true)));
+		product.setNumberOfDayLeftBeforeExpired(this.dateHelper.getNumberOfDay(product.getProductEndDate(), TimeUnit.DAYS,false));
 
 		System.out.println("ouverture " + product.getProductOpenDate());
 		System.out.println("fin"+ product.getProductEndDate());

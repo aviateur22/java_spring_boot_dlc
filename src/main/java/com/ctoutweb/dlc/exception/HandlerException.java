@@ -79,7 +79,7 @@ public class HandlerException {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(value = {JWTVerificationException.class})
+	@ExceptionHandler(value = {TokenExpiredException.class})
 	public ResponseEntity<ErrorResponse>TokenExpiredException(TokenExpiredException ex, WebRequest request){		
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.FORBIDDEN);
@@ -118,7 +118,7 @@ public class HandlerException {
 	public ResponseEntity<ErrorResponse>AuthenticationException(AuthenticationException ex, WebRequest request){
 		ex.printStackTrace();
 		if(ex instanceof NonceExpiredException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("nonce"), HttpStatusCode.valueOf(403));
-		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoire pour acceder à cette ressource"), HttpStatusCode.valueOf(403));
+		if(ex instanceof InsufficientAuthenticationException) return new ResponseEntity<ErrorResponse>(new ErrorResponse("authentication obligatoire pour acceder à cette ressource"), HttpStatusCode.valueOf(401));
 		
 		ErrorResponse error = new ErrorResponse(ex.getMessage().toString());
 		ex.printStackTrace();
@@ -159,5 +159,9 @@ public class HandlerException {
 		ErrorResponse error = new ErrorResponse(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.NOT_FOUND);
 	}
-	
+	@ExceptionHandler(value = {ProductException.class})
+	public ResponseEntity<ErrorResponse> productException(ProductException ex, WebRequest request) {
+		ErrorResponse error = new ErrorResponse(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.BAD_REQUEST);
+	}
 }
