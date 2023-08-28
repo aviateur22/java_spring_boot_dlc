@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ctoutweb.dlc.entity.RoleUserEntity;
 import com.ctoutweb.dlc.entity.UserEntity;
@@ -19,8 +18,7 @@ import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.security.authentication.Role;
 
 @Repository
-public class UserRepositoryImp extends IdKeyHolder implements UserRepository{	
-	
+public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 	private final JdbcTemplate jdbcTemplate;
 	private final NamedParameterJdbcTemplate namedParameterJdbcTemplate; 
 	private final RoleUserRepository roleUserRepository;
@@ -47,7 +45,6 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 	}
 
 	@Override
-	@Transactional
 	public int saveUser(UserEntity user) {		
 		
 		SqlParameterSource sqlParam = new BeanPropertySqlParameterSource(user);		
@@ -66,7 +63,6 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		return this.getKeyHolderId();
 	}
 
-	@SuppressWarnings("null")
 	@Override	
 	public Optional<User> findUserById(int userId) {
 		try {
@@ -91,7 +87,6 @@ public class UserRepositoryImp extends IdKeyHolder implements UserRepository{
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public Optional<User> findUserByEmail(String email) {
 		try {

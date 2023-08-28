@@ -4,23 +4,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.ctoutweb.dlc.repository.UserRepositoryImp;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 
 import com.ctoutweb.dlc.exception.custom.UserNotFoundException;
 import com.ctoutweb.dlc.model.User;
 import com.ctoutweb.dlc.model.UserRole;
-import com.ctoutweb.dlc.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class UserPrincipalDetailService implements UserDetailsService {	
 	
-	private final UserRepository userRepository;	
+	private final UserRepositoryImp userRepository;
 
-	public UserPrincipalDetailService(UserRepository userRepository) {
+	public UserPrincipalDetailService(UserRepositoryImp userRepository) {
 		super();		
 		this.userRepository = userRepository;
 	}
