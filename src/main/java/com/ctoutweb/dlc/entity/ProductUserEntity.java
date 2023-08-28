@@ -5,15 +5,19 @@ import java.util.Objects;
 
 public class ProductUserEntity {
 	private int id;
-	private int user_id;
-	private int product_id;
+	private int userId;
+	private int productId;
 	private Date createdAt;
 	private Date updatedAt;
 	
+	public ProductUserEntity() {
+		
+	}
+	
 	private ProductUserEntity(Builder builder) {
 		this.id = builder.id;
-		this.user_id = builder.user_id;
-		this.product_id = builder.product_id;
+		this.userId = builder.userId;
+		this.productId = builder.productId;
 		this.createdAt = builder.createdAt;
 		this.updatedAt = builder.updatedAt;
 	}
@@ -32,26 +36,26 @@ public class ProductUserEntity {
 	/**
 	 * @return the user_id
 	 */
-	public int getUser_id() {
-		return user_id;
+	public int getUserId() {
+		return userId;
 	}
 	/**
 	 * @param user_id the user_id to set
 	 */
-	public void setUser_id(int user_id) {
-		this.user_id = user_id;
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 	/**
 	 * @return the product_id
 	 */
-	public int getProduct_id() {
-		return product_id;
+	public int getProductId() {
+		return productId;
 	}
 	/**
 	 * @param product_id the product_id to set
 	 */
-	public void setProduct_id(int product_id) {
-		this.product_id = product_id;
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
 	/**
 	 * @return the createdAt
@@ -79,7 +83,7 @@ public class ProductUserEntity {
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, id, product_id, updatedAt, user_id);
+		return Objects.hash(createdAt, id, productId, updatedAt, userId);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -90,12 +94,12 @@ public class ProductUserEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		ProductUserEntity other = (ProductUserEntity) obj;
-		return Objects.equals(createdAt, other.createdAt) && id == other.id && product_id == other.product_id
-				&& Objects.equals(updatedAt, other.updatedAt) && user_id == other.user_id;
+		return Objects.equals(createdAt, other.createdAt) && id == other.id && productId == other.productId
+				&& Objects.equals(updatedAt, other.updatedAt) && userId == other.userId;
 	}
 	@Override
 	public String toString() {
-		return "ProductUserEntity [id=" + id + ", user_id=" + user_id + ", product_id=" + product_id + ", createdAt="
+		return "ProductUserEntity [id=" + id + ", user_id=" + userId + ", product_id=" + productId + ", createdAt="
 				+ createdAt + ", updatedAt=" + updatedAt + "]";
 	}
 	
@@ -105,8 +109,8 @@ public class ProductUserEntity {
 	
 	public static final class Builder {
 		private int id;
-		private int user_id;
-		private int product_id;
+		private int userId;
+		private int productId;
 		private Date createdAt;
 		private Date updatedAt;
 
@@ -118,13 +122,13 @@ public class ProductUserEntity {
 			return this;
 		}
 
-		public Builder withUser_id(int user_id) {
-			this.user_id = user_id;
+		public Builder withUserId(int userId) {
+			this.userId = userId;
 			return this;
 		}
 
-		public Builder withProduct_id(int product_id) {
-			this.product_id = product_id;
+		public Builder withProductId(int productId) {
+			this.productId = productId;
 			return this;
 		}
 

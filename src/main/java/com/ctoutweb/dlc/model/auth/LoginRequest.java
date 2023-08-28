@@ -1,9 +1,17 @@
-package com.ctoutweb.dlc.model;
+package com.ctoutweb.dlc.model.auth;
 
 import java.util.Objects;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class LoginRequest {
+	@NotNull(message = "email obligatoire")
+	@NotBlank(message = "email obligatoire")
 	private String email;
+	
+	@NotNull(message = "mot de passe obligatoire")
+	@NotBlank(message = "mot de passe obligatoire")
 	private String password;
 	/**
 	 * @return the email

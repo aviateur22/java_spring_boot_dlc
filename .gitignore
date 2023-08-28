@@ -1,8 +1,11 @@
 HELP.md
+uploads/
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+todo.txt
+out/
 
 ### STS ###
 .apt_generated

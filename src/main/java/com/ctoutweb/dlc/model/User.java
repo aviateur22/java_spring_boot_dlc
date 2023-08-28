@@ -1,38 +1,46 @@
 package com.ctoutweb.dlc.model;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import com.ctoutweb.dlc.security.Role;
+import java.util.Date;
 
 import java.util.Collections;
 
-public class User {
-	
+public class User {	
 	private int id;
-	private String email;		
-	private Date lastLoginAt;
-	private List<Role> roles;
+	private String email;
+	private boolean isAccountCreated;
+	private Date maximumAccountCreationDate;
+	private Account account;
+	private List<UserRole> roles;
 	private List<Friend> friends;
 	private List<Product> products;
-	private Date createdAt;
-	private Date updatedAt;
+	private List<RandomConfirmationToken> randomConfirmationTokens;
 	
-	public User() {
-		
-	}
-
 	private User(Builder builder) {
 		this.id = builder.id;
 		this.email = builder.email;
-		this.lastLoginAt = builder.lastLoginAt;
+		this.isAccountCreated = builder.isAccountCreated;
+		this.maximumAccountCreationDate = builder.maximumAccountCreationDate;
+		this.account = builder.account;
 		this.roles = builder.roles;
 		this.friends = builder.friends;
 		this.products = builder.products;
-		this.createdAt = builder.createdAt;
-		this.updatedAt = builder.updatedAt;
+		this.randomConfirmationTokens = builder.randomConfirmationTokens;
 	}
+	
+	public User(User user) {
+		this.id = user.id;
+		this.email = user.email;
+		this.isAccountCreated = user.isAccountCreated;
+		this.maximumAccountCreationDate = user.maximumAccountCreationDate;
+		this.account = user.account;
+		this.roles = user.roles;
+		this.friends = user.friends;
+		this.products = user.products;
+		this.randomConfirmationTokens = user.randomConfirmationTokens;
+	}
+	
 	/**
 	 * @return the id
 	 */
@@ -58,27 +66,51 @@ public class User {
 		this.email = email;
 	}
 	/**
-	 * @return the lastLoginAt
+	 * @return the isAccountCreated
 	 */
-	public Date getLastLoginAt() {
-		return lastLoginAt;
+	public boolean getIsAccountCreated() {
+		return isAccountCreated;
 	}
 	/**
-	 * @param lastLoginAt the lastLoginAt to set
+	 * @param isAccountCreated the isAccountCreated to set
 	 */
-	public void setLastLoginAt(Date lastLoginAt) {
-		this.lastLoginAt = lastLoginAt;
+	public void setAccountCreated(boolean isAccountCreated) {
+		this.isAccountCreated = isAccountCreated;
+	}
+	/**
+	 * @return the maximumAccountCreationDate
+	 */
+	public Date getMaximumAccountCreationDate() {
+		return maximumAccountCreationDate;
+	}
+	/**
+	 * @param maximumAccountCreationDate the maximumAccountCreationDate to set
+	 */
+	public void setMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+		this.maximumAccountCreationDate = maximumAccountCreationDate;
+	}
+	/**
+	 * @return the account
+	 */
+	public Account getAccount() {
+		return account;
+	}
+	/**
+	 * @param account the account to set
+	 */
+	public void setAccount(Account account) {
+		this.account = account;
 	}
 	/**
 	 * @return the roles
 	 */
-	public List<Role> getRoles() {
+	public List<UserRole> getRoles() {
 		return roles;
 	}
 	/**
 	 * @param roles the roles to set
 	 */
-	public void setRoles(List<Role> roles) {
+	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
 	}
 	/**
@@ -106,32 +138,21 @@ public class User {
 		this.products = products;
 	}
 	/**
-	 * @return the createdAt
+	 * @return the randomTexts
 	 */
-	public Date getCreatedAt() {
-		return createdAt;
+	public List<RandomConfirmationToken> getRandomConfirmationTokens() {
+		return randomConfirmationTokens;
 	}
 	/**
-	 * @param createdAt the createdAt to set
+	 * @param randomTexts the randomTexts to set
 	 */
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
-	/**
-	 * @return the updatedAt
-	 */
-	public Date getUpdatedAt() {
-		return updatedAt;
-	}
-	/**
-	 * @param updatedAt the updatedAt to set
-	 */
-	public void setUpdatedAt(Date updatedAt) {
-		this.updatedAt = updatedAt;
+	public void setRandomConfirmationTokens(List<RandomConfirmationToken> randomConfirmationTokens) {
+		this.randomConfirmationTokens = randomConfirmationTokens;
 	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(createdAt, email, friends, id, lastLoginAt, products, roles, updatedAt);
+		return Objects.hash(randomConfirmationTokens, account, email, friends, id, isAccountCreated, maximumAccountCreationDate,
+				products, roles);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -142,16 +163,17 @@ public class User {
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		return Objects.equals(createdAt, other.createdAt) && Objects.equals(email, other.email)
-				&& Objects.equals(friends, other.friends) && id == other.id
-				&& Objects.equals(lastLoginAt, other.lastLoginAt) && Objects.equals(products, other.products)
-				&& Objects.equals(roles, other.roles) && Objects.equals(updatedAt, other.updatedAt);
+		return Objects.equals(randomConfirmationTokens, other.randomConfirmationTokens) && Objects.equals(account, other.account)
+				&& Objects.equals(email, other.email) && Objects.equals(friends, other.friends) && id == other.id
+				&& isAccountCreated == other.isAccountCreated
+				&& Objects.equals(maximumAccountCreationDate, other.maximumAccountCreationDate)
+				&& Objects.equals(products, other.products) && Objects.equals(roles, other.roles);
 	}
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", email=" + email + ", lastLoginAt=" + lastLoginAt + ", roles=" + roles
-				+ ", friends=" + friends + ", products=" + products + ", createdAt=" + createdAt + ", updatedAt="
-				+ updatedAt + "]";
+		return "User [id=" + id + ", email=" + email + ", isAccountCreated=" + isAccountCreated
+				+ ", maximumAccountCreationDate=" + maximumAccountCreationDate + ", account=" + account + ", roles="
+				+ roles + ", friends=" + friends + ", products=" + products + ", RandomTexts=" + randomConfirmationTokens + "]";
 	}
 	
 	public static Builder builder() {
@@ -161,12 +183,13 @@ public class User {
 	public static final class Builder {
 		private int id;
 		private String email;
-		private Date lastLoginAt;
-		private List<Role> roles = Collections.emptyList();
+		private boolean isAccountCreated;
+		private Date maximumAccountCreationDate;
+		private Account account;
+		private List<UserRole> roles = Collections.emptyList();
 		private List<Friend> friends = Collections.emptyList();
 		private List<Product> products = Collections.emptyList();
-		private Date createdAt;
-		private Date updatedAt;
+		private List<RandomConfirmationToken> randomConfirmationTokens = Collections.emptyList();
 
 		private Builder() {
 		}
@@ -181,12 +204,22 @@ public class User {
 			return this;
 		}
 
-		public Builder withLastLoginAt(Date lastLoginAt) {
-			this.lastLoginAt = lastLoginAt;
+		public Builder withIsAccountCreated(boolean isAccountCreated) {
+			this.isAccountCreated = isAccountCreated;
 			return this;
 		}
 
-		public Builder withRoles(List<Role> roles) {
+		public Builder withMaximumAccountCreationDate(Date maximumAccountCreationDate) {
+			this.maximumAccountCreationDate = maximumAccountCreationDate;
+			return this;
+		}
+
+		public Builder withAccount(Account account) {
+			this.account = account;
+			return this;
+		}
+
+		public Builder withRoles(List<UserRole> roles) {
 			this.roles = roles;
 			return this;
 		}
@@ -201,13 +234,8 @@ public class User {
 			return this;
 		}
 
-		public Builder withCreatedAt(Date createdAt) {
-			this.createdAt = createdAt;
-			return this;
-		}
-
-		public Builder withUpdatedAt(Date updatedAt) {
-			this.updatedAt = updatedAt;
+		public Builder withRandomTexts(List<RandomConfirmationToken> randomConfirmationTokens) {
+			this.randomConfirmationTokens = randomConfirmationTokens;
 			return this;
 		}
 
@@ -215,4 +243,6 @@ public class User {
 			return new User(this);
 		}
 	}
+
+	
 }
